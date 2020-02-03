@@ -9,10 +9,10 @@ path4 = root_path + 'dataset4/machine.data'
 path2_test = root_path + 'dataset2/adult.test'
 
 dataset1 = pd.read_csv(path1, header=None)
-dataset2 = pd.read_csv(path2, sep = '\,\s+',header=None)
+dataset2 = pd.read_csv(path2, sep = '\,\s+', engine= 'python', header=None)
 dataset3 = pd.read_csv(path3, header=None)
 dataset4 = pd.read_csv(path4, header=None)
-dataset2_test = pd.read_csv(path2_test, header=None)
+dataset2_test = pd.read_csv(path2_test, sep = '\,\s+', engine = 'python', header=None)
 
 
 #%%
@@ -189,3 +189,4 @@ dataset2_arr_test = dataset2_clean_test.to_numpy()
 dataset3_arr = dataset1_clean.to_numpy()
 dataset4_arr = dataset1_clean.to_numpy()
 
+print(np.where((dataset2_test == ' ?'))[0])
