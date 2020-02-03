@@ -6,11 +6,14 @@ path1 = root_path + 'dataset1/ionosphere.data'
 path2 = root_path + 'dataset2/adult.data'
 path3 = root_path + 'dataset3/breast-cancer-wisconsin.data'
 path4 = root_path + 'dataset4/machine.data'
+path2_test = root_path + 'dataset2/adult.test'
 
 dataset1 = pd.read_csv(path1, header=None)
-dataset2 = pd.read_csv(path2, header=None)
+dataset2 = pd.read_csv(path2, sep = '\,\s+',header=None)
 dataset3 = pd.read_csv(path3, header=None)
 dataset4 = pd.read_csv(path4, header=None)
+dataset2_test = pd.read_csv(path2_test, header=None)
+
 
 #%%
 
@@ -42,15 +45,15 @@ def data_report(input_data, dataset_name):
     
     # 2. check missing values
     missing = np.any(pd.isnull(input_data),axis=1)
-    missing_idx = np.where(missing == True)[0]
+    missing_idx = np.unique(np.where(missing == True)[0])
     print('\ninstances with MISSING values: ', '\n', missing_idx)
     
     # 3. check if there are duplicates
-    duplicates = np.where(input_data.duplicated() == True)[0]
+    duplicates = np.unique(np.where(input_data.duplicated() == True)[0])
     print('\nDUPLICATED instances: ', '\n', duplicates)
     
-    # 4. check malformed values (mainly in dataset3 - breast cancer)
-    malformed = np.where(input_data == '?')[0]
+    # 4. check malformed values (mainly in dataset2,3)
+    malformed = np.unique(np.where((input_data == '?'))[0])
     print('\nMALFORMED instances: ', '\n', malformed)
     
     # 5. number of pos. and neg. classes
@@ -76,26 +79,27 @@ def data_report(input_data, dataset_name):
     
 #%%
 def clean_data(input_data): 
-    # 1. remove missing values
+    # 1. find bad data
     missing = np.any(pd.isnull(input_data),axis=1)
-    missing_idx = np.where(missing == True)[0]
+    missing_idx = np.unique(np.where(missing == True)[0])
     
-    # 2. remove duplicates
-    duplicates = np.where(input_data.duplicated() == True)[0]
+    duplicates = np.unique(np.where(input_data.duplicated() == True)[0])
     
-    if missing_idx.size != 0 and duplicates != 0: 
-        remove_idx = np.unique(np.concatenate(missing_idx, duplicates))
-        input_data = input_data.drop(remove_idx)
+    malformed = np.unique(np.where(input_data == '?')[0])
     
-    elif missing_idx.size != 0:
-        input_data = input_data.drop(missing_idx)
-        
-    elif duplicates.size != 0:
-        input_data = input_data.drop(duplicates)
+    # 2. remove bad data
+    bad_data_idx = np.concatenate((missing_idx, duplicates, malformed), axis = None)
     
-    # 3. remove malformed values
-    malformed = np.where(input_data == '?')[0]
-    input_data = input_data.drop(malformed)
+    # find empty indices in bad_data_idx
+    empty_idx = []
+    for i in range(bad_data_idx.size):
+        if bad_data_idx[i] is None:
+            empty_idx.append(i)
+    
+    # removes all empty indices from bad_data_idx
+    bad_data_idx = np.delete(bad_data_idx,empty_idx)
+    
+    input_data = input_data.drop(bad_data_idx)
     
     output_data = input_data.reset_index(drop=True)
     
@@ -133,15 +137,25 @@ def data_prep(input_data, dataset_name):
     return final_data
 
 #%%
+# do data cleaning for both train and test data of dataset2 (adult.data + adult.test)    
+#dataset2_all = (dataset2.copy()).append(dataset2_test, ignore_index = True)
+
+# perform data_prep for all datasets
 dataset1_clean = data_prep(dataset1, 'DATASET1--IONOSPHERE')
 dataset2_clean = data_prep(dataset2, 'DATASET2--ADULT')
+dataset2_clean_test = data_prep(dataset2_test, 'DATASET2---ADULT_TEST')
 dataset3_clean = data_prep(dataset3, 'DATASET3--BREAST CANCER')
 dataset4_clean = data_prep(dataset4, 'DATASET4--MACHINES')
 
 
-# dataset1 and dataset2 do not need to be modified anymore after data_prep()
+# DATASET1 does not need to be modified anymore after data_prep()
 
-# further modification of dataset3:
+# separate dataset2 into training and testing data
+#dataset2_train = dataset2_clean.iloc[0:len(dataset2.index),:]
+#dataset2_test = dataset2_clean.iloc[len(dataset2.index):len(dataset2_clean.index),:]
+
+
+# further modification of DATASET3:
 # - change 7th feature's datatype from str to int64
 dataset3_clean.astype({6: 'int64'})
 
@@ -149,7 +163,7 @@ dataset3_clean.astype({6: 'int64'})
 dataset3_clean = dataset3_clean.drop(dataset3_clean.columns[0], axis=1)
 
 
-# further modifications of dataset4:
+# further modifications of DATASET4:
 # - define a binary class for the dataset: PRP>50, PRP<=50
 class_0_idx = np.where(dataset4_clean[8] <= 50)[0]
 class_1_idx = np.where(dataset4_clean[8] > 50)[0]
@@ -159,6 +173,7 @@ classes = np.arange(len(dataset4_clean.index))
 np.put(classes, class_0_idx, np.zeros(class_0_idx.size))
 np.put(classes, class_1_idx, np.ones(class_1_idx.size))
 
+# replace old performance data with newly created binary class
 new_df = pd.DataFrame({8: classes})
 dataset4_clean.update(new_df)
 
@@ -170,6 +185,7 @@ print(dataset4_clean.iloc[0:20,:])
 # change all output datasets to numpy arrays
 dataset1_arr = dataset1_clean.to_numpy()
 dataset2_arr = dataset1_clean.to_numpy()
+dataset2_arr_test = dataset2_clean_test.to_numpy()
 dataset3_arr = dataset1_clean.to_numpy()
 dataset4_arr = dataset1_clean.to_numpy()
 
