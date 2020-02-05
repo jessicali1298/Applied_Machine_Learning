@@ -5,9 +5,9 @@ import Data_Cleaner as cd
 import Log_Regression as lgr
 from sklearn.linear_model import LogisticRegression
 
-
-
-root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
+#root_path = 
+#root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
+root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1'
 
 path1 = root_path + 'dataset1/ionosphere.data'
 path2 = root_path + 'dataset2/adult.data'

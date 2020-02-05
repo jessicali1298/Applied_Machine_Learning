@@ -102,7 +102,7 @@ class Data_Cleaner:
         return y
         
     #%%
-    def data_prep(self, input_data, dataset_name):
+    def data_prep_log(self, input_data, dataset_name):
         # generate report for basic understanding of dataset
         self.add_one(input_data)
         self.data_report(input_data, dataset_name)
@@ -112,7 +112,12 @@ class Data_Cleaner:
         return final_data
 
 
-        
+    def data_prep_naive(self, input_data, dataset_name):
+        self.data_report(input_data, dataset_name)
+        cleaned_data = self.clean_data(input_data)
+        final_data = self.cat_to_num(cleaned_data)
+        print(final_data.iloc[0:9,:])
+        return final_data
         
         
         
