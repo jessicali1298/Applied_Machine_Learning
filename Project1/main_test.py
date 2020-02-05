@@ -7,6 +7,7 @@ import Log_Regression as lgr
 
 
 root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
+
 path1 = root_path + 'dataset1/ionosphere.data'
 path2 = root_path + 'dataset2/adult.data'
 path3 = root_path + 'dataset3/breast-cancer-wisconsin.data'
