@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-class DataCleaner:
+class Data_Cleaner:
     
     def data_report(self, input_data, dataset_name):
         print('\n----DATA REPORT OF ',dataset_name, '----')
@@ -93,11 +93,28 @@ class DataCleaner:
         print('\nIndices of Categorical Variables: ', category_var)
         return output_data
     
+    def add_one(self, input_data):
+        input_data = input_data.insert(0, 'a', np.ones(len(input_data.index)))
+     
+    def extract_y(self, input_data):
+        y = input_data.iloc[:,len(input_data.columns)-1]
+        input_data = input_data.drop(input_data.columns[-1], axis=1)
+        return y
+        
     #%%
     def data_prep(self, input_data, dataset_name):
         # generate report for basic understanding of dataset
+        self.add_one(input_data)
         self.data_report(input_data, dataset_name)
         cleaned_data = self.clean_data(input_data)
         final_data = self.cat_to_num(cleaned_data)
         print(final_data.iloc[0:9,:])
         return final_data
+
+
+        
+        
+        
+        
+        
+        
