@@ -98,7 +98,7 @@ class Data_Cleaner:
      
     def extract_y(self, input_data):
         y = input_data.iloc[:,len(input_data.columns)-1]
-        input_data = input_data.drop(input_data.columns[-1], axis=1)
+        
         return y
         
     #%%
