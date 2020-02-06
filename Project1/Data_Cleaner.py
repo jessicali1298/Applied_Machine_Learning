@@ -98,12 +98,12 @@ class Data_Cleaner:
      
     def extract_y(self, input_data):
         y = input_data.iloc[:,len(input_data.columns)-1]
-        
         return y
+    
         
     #%%
-    def data_prep_log(self, input_data, dataset_name):
-        # generate report for basic understanding of dataset
+    def data_prep(self, input_data, dataset_name):
+        # add a column of 1 to train data to get bias term for log reg
         self.add_one(input_data)
         self.data_report(input_data, dataset_name)
         cleaned_data = self.clean_data(input_data)
@@ -111,13 +111,16 @@ class Data_Cleaner:
         print(final_data.iloc[0:9,:])
         return final_data
 
-
-    def data_prep_naive(self, input_data, dataset_name):
-        self.data_report(input_data, dataset_name)
-        cleaned_data = self.clean_data(input_data)
-        final_data = self.cat_to_num(cleaned_data)
-        print(final_data.iloc[0:9,:])
-        return final_data
+    def data_prep_naive(self, input_data):
+        output_data = input_data.drop(input_data.columns[0], axis=1).to_numpy()
+        return output_data
+    
+#    def data_prep_naive(self, input_data, dataset_name):
+#        self.data_report(input_data, dataset_name)
+#        cleaned_data = self.clean_data(input_data)
+#        final_data = self.cat_to_num(cleaned_data)
+#        print(final_data.iloc[0:9,:])
+#        return final_data
         
         
         
