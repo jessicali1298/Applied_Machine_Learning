@@ -64,16 +64,10 @@ class Log_Regression:
             
         return pred_arr
         
-<<<<<<< HEAD
-    def evaluate(y_truth, y_pred):
-        comparison = np.equal(y_truth, y_pred)
-        accuracy = (np.where(comparison == True)[0].size)/comparison.size
-=======
+
     def evaluate(self, y_truth, y_pred):
         comparison = np.equal(y_truth, y_pred)
         accuracy = (np.where(comparison == True)[0].size)/comparison.size
-        
->>>>>>> 826c9f98e17b5e51e0efa1f85cbd8becab22d300
         return accuracy
        
         

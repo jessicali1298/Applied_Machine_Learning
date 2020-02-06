@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import Data_Cleaner as cd
 import Log_Regression as lgr
+import Naive_Bayes as nb
 from sklearn.linear_model import LogisticRegression
 
 #root_path = 
@@ -136,3 +137,44 @@ accuracy_ski = clf.score(test_data, test_y)
 
 print(accuracy)
 print(accuracy_ski)
+
+
+
+
+
+
+
+#%%
+#----------------------------TEST NAIVE BAYES----------------------------
+# Test calculating class probabilities
+
+dataset = np.array([[3.393533211,2.331273381,0],
+	[3.110073483,1.781539638,0],
+	[1.343808831,3.368360954,0],
+	[3.582294042,4.67917911,0],
+	[2.280362439,2.866990263,0],
+	[7.423436942,4.696522875,1],
+	[5.745051997,3.533989803,1],
+	[9.172168622,2.511101045,1],
+	[7.792783481,3.424088941,1],
+	[7.939820817,0.791637231,1]])
+
+nbc = nb.Naive_Bayes()
+
+summaries = nbc.fit(dataset1_arr_naive)
+print(summaries)
+totalRows = dataset1_arr_naive.shape[0]
+prediction = nbc.predict(summaries, dataset1_arr_naive[0], totalRows)
+print(prediction)
+    
+
+
+
+
+
+
+
+
+
+
+
