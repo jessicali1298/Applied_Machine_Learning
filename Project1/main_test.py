@@ -10,7 +10,9 @@ from sklearn.naive_bayes import GaussianNB
 
 #root_path = 
 #root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
-root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
+#root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
+root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
+
 
 path1 = root_path + 'dataset1/ionosphere.data'
 path2 = root_path + 'dataset2/adult.data'
@@ -166,9 +168,12 @@ dataset = np.array([[3.393533211,2.331273381,0],
 # OUR MODEL
 nbc = nb.Naive_Bayes()
 
-summaries = nbc.fit(dataset2_arr_naive)
-print(summaries)
-totalRows = dataset2_arr_naive.shape[0]
+
+summaries = nbc.fit(dataset1_arr_naive)
+print("sum,ary",summaries)
+totalRows = dataset1_arr_naive.shape[0]
+print("total row",totalRows)
+
 prediction = nbc.predict(summaries, dataset1_arr_naive[0], totalRows)
 print(prediction)
     

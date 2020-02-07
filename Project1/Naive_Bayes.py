@@ -1,5 +1,5 @@
 import numpy as np
-from math import exp,log,pi,sqrt
+from math import exp,log,pi,sqrt,isnan
 
 class Naive_Bayes:
     
@@ -38,7 +38,12 @@ class Naive_Bayes:
     		probabilities[category] = log(summaries[category][0][-1]/float(totalRowsInDataset)) # this adds the prior (always the first row cause they should be the same for all)
     		for i in range(len(classSummaries)):
     			mean, stdev, count = classSummaries[i]
-    			probabilities[category] += log(self.calculateProbability(row[i], mean, stdev)) # collection per feature per class
+    			if isnan(log(self.calculateProbability(row[i], mean, stdev))):
+    			  print("nan encounted")
+    			else:
+    			  probabilities[category] += log(self.calculateProbability(row[i], mean, stdev))
+    			#print("std", classSummaries[i], "prob", log(self.calculateProbability(row[i], mean, stdev)))
+    			#probabilities[category] += log(self.calculateProbability(row[i], mean, stdev)) # collection per feature per class
     	return probabilities
     
     
