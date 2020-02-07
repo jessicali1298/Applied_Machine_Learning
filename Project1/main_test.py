@@ -5,6 +5,8 @@ import Data_Cleaner as cd
 import Log_Regression as lgr
 import Naive_Bayes as nb
 from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
+
 
 #root_path = 
 #root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
@@ -105,8 +107,9 @@ dataset3_arr = dataset1_clean.to_numpy()
 dataset4_arr = dataset1_clean.to_numpy()
 
 
+
 #%%
-#--------------------TEST LOGISTIC REGRESSION-----------------
+#--------------------------PREPARE TEST DATA--------------------------------
 # Add 1 to X in the front
 #shape0, shape1 = dataset1_arr.shape
 #train_data = dataset1_arr[np.arange(int(shape0/5*4))]
@@ -120,7 +123,8 @@ test_data = dataset2_arr[np.arange(int(shape0/5*4),shape0)]
 train_y = y2[np.arange(int(shape0/5*4))]
 test_y = y2[np.arange(int(shape0/5*4), shape0)]
 
-
+#%%
+#--------------------TEST LOGISTIC REGRESSION-----------------
 N,m = train_data.shape
 
 # OUR MODEL
@@ -159,15 +163,22 @@ dataset = np.array([[3.393533211,2.331273381,0],
 	[7.792783481,3.424088941,1],
 	[7.939820817,0.791637231,1]])
 
+# OUR MODEL
 nbc = nb.Naive_Bayes()
 
-summaries = nbc.fit(dataset1_arr_naive)
+summaries = nbc.fit(dataset2_arr_naive)
 print(summaries)
-totalRows = dataset1_arr_naive.shape[0]
+totalRows = dataset2_arr_naive.shape[0]
 prediction = nbc.predict(summaries, dataset1_arr_naive[0], totalRows)
 print(prediction)
     
+# SKLEARN
+#clf_nb = GaussianNB()
+#clf_nb.fit(train_data, train_y)
+#y_pred_ski_nb = clf.predict(test_data)
+#accuracy_ski_nb = clf.score(test_data, test_y)
 
+#print(accuracy_ski_nb)
 
 
 
