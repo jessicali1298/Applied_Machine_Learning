@@ -56,6 +56,5 @@ class Naive_Bayes:
         prob = self.calculateClassProbabilities(summaries, row, totalRowsInDataset)
         return prob
     
-    def evaluate(self, dataset):
-        #CODE
-
+#    def evaluate(self, dataset):
+#        #CODE

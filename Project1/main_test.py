@@ -8,10 +8,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 
 
-#root_path = 
 #root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
-#root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
-root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
+root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
+#root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
 
 
 path1 = root_path + 'dataset1/ionosphere.data'
