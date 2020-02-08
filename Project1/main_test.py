@@ -173,7 +173,6 @@ summaries = nbc.fit(dataset1_arr_naive)
 print("sum,ary",summaries)
 totalRows = dataset1_arr_naive.shape[0]
 print("total row",totalRows)
-
 print("test_y", test_y.shape, "type",type(test_y))
 predicted = np.array([])
 lable = np.array([])
@@ -189,15 +188,6 @@ for i in range(totalRows):
 print(predicted.shape,lable.shape)
 comparison = nbc.evaluate(lable, predicted)
 print("accuracy",comparison)
-  
-#print(dataset1_arr_naive[1])
-#prediction = nbc.predict(summaries, dataset1_arr_naive[1], totalRows)
-#print(max(prediction.items(), key=operator.itemgetter(1))[0])
-
-
-prediction = nbc.predict(summaries, dataset1_arr_naive[0], totalRows)
-print(prediction)
-
     
 # SKLEARN
 #clf_nb = GaussianNB()
