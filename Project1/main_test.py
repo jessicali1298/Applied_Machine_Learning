@@ -4,6 +4,7 @@ import numpy as np
 import Data_Cleaner as cd
 import Log_Regression as lgr
 import Naive_Bayes as nb
+import operator
 from sklearn.linear_model import LogisticRegression
 
 #root_path = 
@@ -167,8 +168,25 @@ summaries = nbc.fit(dataset1_arr_naive)
 print("sum,ary",summaries)
 totalRows = dataset1_arr_naive.shape[0]
 print("total row",totalRows)
-prediction = nbc.predict(summaries, dataset1_arr_naive[0], totalRows)
-print(prediction)
+print("test_y", test_y.shape, "type",type(test_y))
+predicted = np.array([])
+lable = np.array([])
+
+for i in range(totalRows):
+    prediction = nbc.predict(summaries, dataset1_arr_naive[i], totalRows)
+    #print(dataset1_arr_naive[i][-1])
+    #print(max(prediction.items(), key=operator.itemgetter(1))[0])
+    predicted = np.append(predicted, max(prediction.items(), key=operator.itemgetter(1))[0])
+    lable = np.append(lable, dataset1_arr_naive[i][-1])
+    #comparison = nbc.evaluate(lable, predicted)
+    #print("comparison",comparison)
+print(predicted.shape,lable.shape)
+comparison = nbc.evaluate(lable, predicted)
+print("accuracy",comparison)
+  
+#print(dataset1_arr_naive[1])
+#prediction = nbc.predict(summaries, dataset1_arr_naive[1], totalRows)
+#print(max(prediction.items(), key=operator.itemgetter(1))[0])
     
 
 
