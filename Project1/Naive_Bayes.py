@@ -10,13 +10,13 @@ class Naive_Bayes:
     
     def breakDown(self, dataset):
     	rowsPerClass = dict()
+        
     	for i in range(len(dataset)):
     		eachRow = dataset[i]
     		lable = eachRow[-1] #the last entry is always the lable
     		if (lable not in rowsPerClass):
     			rowsPerClass[lable] = list() #create the list for each category to hold the values
     		rowsPerClass[lable].append(eachRow)
-    		#print("eachRow",eachRow)
     	VariablesPerFeature = dict() #hold the mean and std per feature where each key is the class
     	for classValue, rows in rowsPerClass.items():
     		VariablesPerFeature[classValue] = self.getNeededValuesPerClass(rows) #do all the calcuation per category
@@ -55,6 +55,7 @@ class Naive_Bayes:
         prob = self.calculateClassProbabilities(summaries, row, totalRowsInDataset)
         return prob
     
+
     def evaluate(self, y_truth, y_pred):
         comparison = np.equal(y_truth, y_pred)
         accuracy = (np.where(comparison == True)[0].size)/comparison.size
