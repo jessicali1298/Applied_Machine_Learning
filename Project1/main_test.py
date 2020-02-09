@@ -168,32 +168,35 @@ dataset = np.array([[3.393533211,2.331273381,0],
 # OUR MODEL
 nbc = nb.Naive_Bayes()
 
-trainDataWithLable = np.append(train_data,train_y.reshape(train_data.shape[0],1),axis=1)
+shape0, shape1 = dataset2_arr_test_naive.shape
+train_data_nb = dataset2_arr_test_naive[np.arange(int(shape0/5*4))]
+test_data_nb = dataset2_arr_test_naive[np.arange(int(shape0/5*4),shape0)]
+train_y_nb = y2[np.arange(int(shape0/5*4))]
+test_y_nb = y2[np.arange(int(shape0/5*4), shape0)]
+
+
+
+trainDataWithLable = np.append(train_data_nb,train_y_nb.reshape(train_data_nb.shape[0],1),axis=1)
 print(trainDataWithLable)
 
-testDataWithLable = np.append(test_data,test_y.reshape(test_data.shape[0],1),axis=1)
-print(testDataWithLable)
+testDataWithLable = np.append(test_data_nb,test_y_nb.reshape(test_data_nb.shape[0],1),axis=1)
+#print(testDataWithLable)
 
 summaries = nbc.fit(trainDataWithLable)
-print("sum,ary",summaries)
-totalRows = testDataWithLable.shape[0]
+print("summaries",summaries)
+totalRows = trainDataWithLable.shape[0]
 print("total row",totalRows)
-print("test_y", test_y.shape, "type",type(test_y))
+#print("test_y", test_y.shape, "type",type(test_y))
 predicted = np.array([])
 lable = np.array([])
 
-for i in range(totalRows):
+for i in range(testDataWithLable.shape[0]):
     prediction = nbc.predict(summaries, testDataWithLable[i], totalRows)
-    #print(dataset1_arr_naive[i][-1])
-    #print(max(prediction.items(), key=operator.itemgetter(1))[0])
     predicted = np.append(predicted, max(prediction.items(), key=operator.itemgetter(1))[0])
     lable = np.append(lable, testDataWithLable[i][-1])
-    #comparison = nbc.evaluate(lable, predicted)
-    #print("comparison",comparison)
-print(predicted.shape,lable.shape)
 comparison = nbc.evaluate(lable, predicted)
 print("accuracy of implementation",comparison)
-   
+ 
 # SKLEARN
 clf_nb = GaussianNB()
 clf_nb.fit(train_data, train_y)

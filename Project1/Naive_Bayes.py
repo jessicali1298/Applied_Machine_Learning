@@ -20,6 +20,7 @@ class Naive_Bayes:
     	VariablesPerFeature = dict() #hold the mean and std per feature where each key is the class
     	for classValue, rows in rowsPerClass.items():
     		VariablesPerFeature[classValue] = self.getNeededValuesPerClass(rows) #do all the calcuation per category
+    	#print(VariablesPerFeature)
     	return VariablesPerFeature
     
     
@@ -33,15 +34,12 @@ class Naive_Bayes:
     def calculateClassProbabilities(self, summaries, row, totalRowsInDataset):
     	probabilities = dict()
     	for category, classSummaries in summaries.items():
-    		probabilities[category] = log(summaries[category][0][-1]/float(totalRowsInDataset)) # this adds the prior (always the first row cause they should be the same for all)
+    		#print(summaries[category][0][-1])
+    		probabilities[category] = np.log(summaries[category][0][-1]/float(totalRowsInDataset)) # this adds the prior (always the first row cause they should be the same for all)
     		for i in range(len(classSummaries)):
     			mean, stdev, count = classSummaries[i]
-    			if not isnan(log(self.calculateProbability(row[i], mean, stdev))):
-    			  #print("nan encounted")
-    			#else:
-    			  probabilities[category] += log(self.calculateProbability(row[i], mean, stdev))
-    			#print("std", classSummaries[i], "prob", log(self.calculateProbability(row[i], mean, stdev)))
-    			#probabilities[category] += log(self.calculateProbability(row[i], mean, stdev)) # collection per feature per class
+    			if not isnan((self.calculateProbability(row[i], mean, stdev))):
+    			  probabilities[category] += np.log(self.calculateProbability(row[i], mean, stdev))
     	return probabilities
     
     
@@ -60,4 +58,3 @@ class Naive_Bayes:
         accuracy = (np.where(comparison == True)[0].size)/comparison.size
         return accuracy
     
-
