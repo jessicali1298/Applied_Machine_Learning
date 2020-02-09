@@ -4,13 +4,14 @@ import numpy as np
 import Data_Cleaner as cd
 import Log_Regression as lgr
 import Naive_Bayes as nb
+import operator
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 
 
 #root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
-root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
-#root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
+#root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
+root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
 
 
 path1 = root_path + 'dataset1/ionosphere.data'
@@ -167,22 +168,39 @@ dataset = np.array([[3.393533211,2.331273381,0],
 # OUR MODEL
 nbc = nb.Naive_Bayes()
 
+trainDataWithLable = np.append(train_data,train_y.reshape(train_data.shape[0],1),axis=1)
+print(trainDataWithLable)
 
-summaries = nbc.fit(dataset1_arr_naive)
+testDataWithLable = np.append(test_data,test_y.reshape(test_data.shape[0],1),axis=1)
+print(testDataWithLable)
+
+summaries = nbc.fit(trainDataWithLable)
 print("sum,ary",summaries)
-totalRows = dataset1_arr_naive.shape[0]
+totalRows = testDataWithLable.shape[0]
 print("total row",totalRows)
+print("test_y", test_y.shape, "type",type(test_y))
+predicted = np.array([])
+lable = np.array([])
 
-prediction = nbc.predict(summaries, dataset1_arr_naive[0], totalRows)
-print(prediction)
-    
+for i in range(totalRows):
+    prediction = nbc.predict(summaries, testDataWithLable[i], totalRows)
+    #print(dataset1_arr_naive[i][-1])
+    #print(max(prediction.items(), key=operator.itemgetter(1))[0])
+    predicted = np.append(predicted, max(prediction.items(), key=operator.itemgetter(1))[0])
+    lable = np.append(lable, testDataWithLable[i][-1])
+    #comparison = nbc.evaluate(lable, predicted)
+    #print("comparison",comparison)
+print(predicted.shape,lable.shape)
+comparison = nbc.evaluate(lable, predicted)
+print("accuracy of implementation",comparison)
+   
 # SKLEARN
-#clf_nb = GaussianNB()
-#clf_nb.fit(train_data, train_y)
-#y_pred_ski_nb = clf.predict(test_data)
-#accuracy_ski_nb = clf.score(test_data, test_y)
+clf_nb = GaussianNB()
+clf_nb.fit(train_data, train_y)
+y_pred_ski_nb = clf.predict(test_data)
+accuracy_ski_nb = clf.score(test_data, test_y)
 
-#print(accuracy_ski_nb)
+print(accuracy_ski_nb)
 
 
 
