@@ -10,8 +10,8 @@ from sklearn.naive_bayes import GaussianNB
 
 
 #root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
-#root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
-root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
+root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
+#root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
 
 
 path1 = root_path + 'dataset1/ionosphere.data'
@@ -105,8 +105,8 @@ y4, dataset4_log = split_y(dataset4_clean)
 dataset1_arr = dataset1_log.to_numpy()
 dataset2_arr = dataset1_log.to_numpy()
 dataset2_arr_test = dataset2_clean_test.to_numpy()
-dataset3_arr = dataset1_clean.to_numpy()
-dataset4_arr = dataset1_clean.to_numpy()
+dataset3_arr = dataset3_log.to_numpy()
+dataset4_arr = dataset4_log.to_numpy()
 
 
 
@@ -119,11 +119,38 @@ dataset4_arr = dataset1_clean.to_numpy()
 #train_y = y1[np.arange(int(shape0/5*4))]
 #test_y = y1[np.arange(int(shape0/5*4), shape0)]
 
-shape0, shape1 = dataset2_arr.shape
-train_data = dataset2_arr[np.arange(int(shape0/5*4))]
-test_data = dataset2_arr[np.arange(int(shape0/5*4),shape0)]
-train_y = y2[np.arange(int(shape0/5*4))]
-test_y = y2[np.arange(int(shape0/5*4), shape0)]
+#shape0, shape1 = dataset2_arr.shape
+#train_data = dataset2_arr[np.arange(int(shape0/5*4))]
+#test_data = dataset2_arr[np.arange(int(shape0/5*4),shape0)]
+#train_y = y2[np.arange(int(shape0/5*4))]
+#test_y = y2[np.arange(int(shape0/5*4), shape0)]
+
+#shape0, shape1 = dataset3_arr.shape
+#train_data = dataset3_arr[np.arange(int(shape0/5*4))]
+#test_data = dataset3_arr[np.arange(int(shape0/5*4),shape0)]
+#train_y = y3[np.arange(int(shape0/5*4))]
+#test_y = y3[np.arange(int(shape0/5*4), shape0)]
+
+#shape0, shape1 = dataset4_arr.shape
+#train_data = dataset4_arr[np.arange(int(shape0/5*4))]
+#test_data = dataset4_arr[np.arange(int(shape0/5*4),shape0)]
+#train_y = y4[np.arange(int(shape0/5*4))]
+#test_y = y4[np.arange(int(shape0/5*4), shape0)]
+
+splited_sample = np.array_split(dataset4_arr, 5)
+test_data = splited_sample[0]
+train_data = np.concatenate((splited_sample[1:4]), axis=0)
+print(train_data.shape)
+
+
+
+splited_y = np.array_split(y4, 5)
+test_y = splited_y[0]
+train_y = np.concatenate((splited_y[1:4]), axis=0)
+print(train_y.shape)
+print(dataset4_arr.shape)
+print(y4.shape)
+
 
 #%%
 #--------------------TEST LOGISTIC REGRESSION-----------------
@@ -143,7 +170,6 @@ accuracy_ski = clf.score(test_data, test_y)
 
 print(accuracy)
 print(accuracy_ski)
-
 
 
 

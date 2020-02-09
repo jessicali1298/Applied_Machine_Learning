@@ -1,5 +1,5 @@
 import numpy as np
-from math import exp,log,pi,sqrt,isnan
+#from math import exp,log,pi,sqrt,isnan
 
 class Naive_Bayes:
     
