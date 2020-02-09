@@ -4,14 +4,15 @@ import numpy as np
 import Data_Cleaner as cd
 import Log_Regression as lgr
 import Naive_Bayes as nb
+import Cross_Validation as cv
 import operator
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 
 
-#root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
+root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
 #root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
-root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
+#root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
 
 
 path1 = root_path + 'dataset1/ionosphere.data'
@@ -127,13 +128,19 @@ test_y = y2[np.arange(int(shape0/5*4), shape0)]
 
 #%%
 #--------------------TEST LOGISTIC REGRESSION-----------------
-N,m = train_data.shape
+#N,m = train_data.shape
+#
+## OUR MODEL
+#lg = lgr.Log_Regression(np.zeros(m))
+#lg.fit(train_data, train_y, 0.1, 0.01)
+#y_pred = lg.predict(test_data)
+#accuracy = lg.evaluate(test_y, y_pred)
 
-# OUR MODEL
-lg = lgr.Log_Regression(np.zeros(m))
-lg.fit(train_data, train_y, 0.1, 0.01)
-y_pred = lg.predict(test_data)
-accuracy = lg.evaluate(test_y, y_pred)
+splited_log = cv.Cross_Validation.dataset_sep(dataset1_arr, 5)
+result_log = cv.Cross_Validation.k_fold_log(splited_log, 5)
+
+
+print("\n" + "result: ", result_log)
 
 # SK-LEARN
 clf = LogisticRegression()
