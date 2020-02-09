@@ -3,11 +3,16 @@ import pandas as pd
 import numpy as np
 import Data_Cleaner as cd
 import Log_Regression as lgr
+import Naive_Bayes as nb
+import operator
 from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
 
-#root_path = 
+
 #root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
-root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
+#root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
+root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
+
 
 path1 = root_path + 'dataset1/ionosphere.data'
 path2 = root_path + 'dataset2/adult.data'
@@ -104,8 +109,9 @@ dataset3_arr = dataset1_clean.to_numpy()
 dataset4_arr = dataset1_clean.to_numpy()
 
 
+
 #%%
-#--------------------TEST LOGISTIC REGRESSION-----------------
+#--------------------------PREPARE TEST DATA--------------------------------
 # Add 1 to X in the front
 #shape0, shape1 = dataset1_arr.shape
 #train_data = dataset1_arr[np.arange(int(shape0/5*4))]
@@ -119,7 +125,8 @@ test_data = dataset2_arr[np.arange(int(shape0/5*4),shape0)]
 train_y = y2[np.arange(int(shape0/5*4))]
 test_y = y2[np.arange(int(shape0/5*4), shape0)]
 
-
+#%%
+#--------------------TEST LOGISTIC REGRESSION-----------------
 N,m = train_data.shape
 
 # OUR MODEL
@@ -136,3 +143,71 @@ accuracy_ski = clf.score(test_data, test_y)
 
 print(accuracy)
 print(accuracy_ski)
+
+
+
+
+
+
+
+#%%
+#----------------------------TEST NAIVE BAYES----------------------------
+# Test calculating class probabilities
+
+dataset = np.array([[3.393533211,2.331273381,0],
+	[3.110073483,1.781539638,0],
+	[1.343808831,3.368360954,0],
+	[3.582294042,4.67917911,0],
+	[2.280362439,2.866990263,0],
+	[7.423436942,4.696522875,1],
+	[5.745051997,3.533989803,1],
+	[9.172168622,2.511101045,1],
+	[7.792783481,3.424088941,1],
+	[7.939820817,0.791637231,1]])
+
+# OUR MODEL
+nbc = nb.Naive_Bayes()
+
+trainDataWithLable = np.append(train_data,train_y.reshape(train_data.shape[0],1),axis=1)
+print(trainDataWithLable)
+
+testDataWithLable = np.append(test_data,test_y.reshape(test_data.shape[0],1),axis=1)
+print(testDataWithLable)
+
+summaries = nbc.fit(trainDataWithLable)
+print("sum,ary",summaries)
+totalRows = testDataWithLable.shape[0]
+print("total row",totalRows)
+print("test_y", test_y.shape, "type",type(test_y))
+predicted = np.array([])
+lable = np.array([])
+
+for i in range(totalRows):
+    prediction = nbc.predict(summaries, testDataWithLable[i], totalRows)
+    #print(dataset1_arr_naive[i][-1])
+    #print(max(prediction.items(), key=operator.itemgetter(1))[0])
+    predicted = np.append(predicted, max(prediction.items(), key=operator.itemgetter(1))[0])
+    lable = np.append(lable, testDataWithLable[i][-1])
+    #comparison = nbc.evaluate(lable, predicted)
+    #print("comparison",comparison)
+print(predicted.shape,lable.shape)
+comparison = nbc.evaluate(lable, predicted)
+print("accuracy of implementation",comparison)
+   
+# SKLEARN
+clf_nb = GaussianNB()
+clf_nb.fit(train_data, train_y)
+y_pred_ski_nb = clf.predict(test_data)
+accuracy_ski_nb = clf.score(test_data, test_y)
+
+print(accuracy_ski_nb)
+
+
+
+
+
+
+
+
+
+
