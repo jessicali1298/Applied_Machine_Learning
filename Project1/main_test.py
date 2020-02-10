@@ -177,56 +177,79 @@ log_score, sk_log_score = cvo.log_k_fold(5, dataset1_clean, 0.1, 0.01)
 #----------------------------TEST NAIVE BAYES----------------------------
 # Test calculating class probabilities
 
-#dataset = np.array([[3.393533211,2.331273381,0],
-#	[3.110073483,1.781539638,0],
-#	[1.343808831,3.368360954,0],
-#	[3.582294042,4.67917911,0],
-#	[2.280362439,2.866990263,0],
-#	[7.423436942,4.696522875,1],
-#	[5.745051997,3.533989803,1],
-#	[9.172168622,2.511101045,1],
-#	[7.792783481,3.424088941,1],
-#	[7.939820817,0.791637231,1]])
-#
-## OUR MODEL
-#nbc = nb.Naive_Bayes()
-#
-#shape0, shape1 = dataset2_arr_test_naive.shape
+dataset = np.array([[3.393533211,2.331273381,0],
+	[3.110073483,1.781539638,0],
+	[1.343808831,3.368360954,0],
+	[3.582294042,4.67917911,0],
+	[2.280362439,2.866990263,0],
+	[7.423436942,4.696522875,1],
+	[5.745051997,3.533989803,1],
+	[9.172168622,2.511101045,1],
+	[7.792783481,3.424088941,1],
+	[7.939820817,0.791637231,1]])
+
+
+
+#shape0, shape1 = dataset2_arr_naive.shape
 #train_data_nb = dataset2_arr_test_naive[np.arange(int(shape0/5*4))]
 #test_data_nb = dataset2_arr_test_naive[np.arange(int(shape0/5*4),shape0)]
 #train_y_nb = y2[np.arange(int(shape0/5*4))]
 #test_y_nb = y2[np.arange(int(shape0/5*4), shape0)]
-#
-#
-#
+
+
+
 #trainDataWithLable = np.append(train_data_nb,train_y_nb.reshape(train_data_nb.shape[0],1),axis=1)
 #print(trainDataWithLable)
 #
 #testDataWithLable = np.append(test_data_nb,test_y_nb.reshape(test_data_nb.shape[0],1),axis=1)
 ##print(testDataWithLable)
-#
-#summaries = nbc.fit(trainDataWithLable)
-#print("summaries",summaries)
-#totalRows = trainDataWithLable.shape[0]
-#print("total row",totalRows)
-##print("test_y", test_y.shape, "type",type(test_y))
-#predicted = np.array([])
-#lable = np.array([])
-#
-#for i in range(testDataWithLable.shape[0]):
-#    prediction = nbc.predict(summaries, testDataWithLable[i], totalRows)
-#    predicted = np.append(predicted, max(prediction.items(), key=operator.itemgetter(1))[0])
-#    lable = np.append(lable, testDataWithLable[i][-1])
-#comparison = nbc.evaluate(lable, predicted)
-#print("accuracy of implementation",comparison)
-# 
-## SKLEARN
-#clf_nb = GaussianNB()
-#clf_nb.fit(train_data, train_y)
-#y_pred_ski_nb = clf.predict(test_data)
-#accuracy_ski_nb = clf.score(test_data, test_y)
-#
-#print(accuracy_ski_nb)
+    
+    
+
+# OUR MODEL
+nbc = nb.Naive_Bayes()
+
+splited_naive = np.array_split(dataset1_arr_naive, 5)
+testDataWithLabel = splited_naive[0]
+trainDataWithLabel = np.concatenate(np.delete(splited_naive,0,0),axis=0)
+
+
+summaries = nbc.fit(trainDataWithLable)
+print("summaries",summaries)
+totalRows = trainDataWithLable.shape[0]
+print("total row",totalRows)
+#print("test_y", test_y.shape, "type",type(test_y))
+predicted = np.array([])
+lable = np.array([])
+
+for i in range(testDataWithLable.shape[0]):
+    prediction = nbc.predict(summaries, testDataWithLable[i], totalRows)
+    predicted = np.append(predicted, max(prediction.items(), key=operator.itemgetter(1))[0])
+    lable = np.append(lable, testDataWithLable[i][-1])
+comparison = nbc.evaluate(lable, predicted)
+print("accuracy of implementation",comparison)
+ 
+# SKLEARN
+# split data for SKlearn's inputs
+y1, sk_data1 = cvo.split_y(dataset1_clean)
+sk_data1_arr = sk_data1.to_numpy()
+
+splited_y = np.array_split(y1, 5)
+splited_data = np.array_split(sk_data1_arr,5)
+
+test_y = splited_y[0]
+train_y = np.concatenate(np.delete(splited_y,0,0),axis=0)
+
+test_data = splited_data[0]
+train_data = np.concatenate(np.delete(splited_data,0,0), axis=0)
+
+#test SKLEARN
+clf_nb = GaussianNB()
+clf_nb.fit(train_data, train_y)
+y_pred_ski_nb = clf.predict(test_data)
+accuracy_ski_nb = clf.score(test_data, test_y)
+
+print(accuracy_ski_nb)
 
 
 
