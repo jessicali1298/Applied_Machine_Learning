@@ -26,24 +26,52 @@ class Data_Cleaner:
         counts = input_data.iloc[:,input_data.shape[1]-1].value_counts()
         print('\n# of binary classifications: ', '\n', counts)
     
+        
+        
+    #%%
+    def data_stats(self, input_data):
         # 6. Distribution of numerical features (min, max, mean, range)
-        numeric_feature_idx = np.where((data_types == int) | (data_types == float))
+        data_types = input_data.dtypes
+        numeric_feature_idx = np.where((data_types == int) | (data_types == float))[0]
         
-        numeric_df = input_data.loc[numeric_feature_idx]
-        numeric_max = numeric_df.max(axis=1)
-        numeric_min = numeric_df.min(axis=1)
-        numeric_mean = numeric_df.mean(axis=1)
-        numeric_range = numeric_max - numeric_min
+        numeric_max = []
+        numeric_min = []
+        numeric_mean = []
+        numeric_range = []
         
+        
+        for i in range(numeric_feature_idx.shape[0]):
+            numeric = input_data.iloc[:,numeric_feature_idx[i]].to_numpy()
+#            print(numeric)
+            num_max = np.max(numeric)
+            num_min = np.min(numeric)
+            num_mean = np.mean(numeric)
+            num_range = num_max - num_min
+            
+            numeric_max.append(num_max)
+            numeric_min.append(num_min)
+            numeric_mean.append(num_mean)
+            numeric_range.append(num_range)
+            
         # numeric_analysis = np.c_(numeric_max, numeric_min, numeric_mean, numeric_range)
         analysis_df = pd.DataFrame({'max':numeric_max, 'min': numeric_min,
                                     'mean':numeric_mean, 'range':numeric_range})
         
         
         print('\n', analysis_df)
+        return analysis_df
+    
+    def normalize(self, input_col):
+        
+        input_mean = np.mean(input_col)
+        input_range = np.max(input_col) - np.min(input_col)
+        output_col = (input_col - input_mean)/input_range
+        return output_col
         
         
-    #%%
+        
+        
+        
     def clean_data(self, input_data): 
         # 1. find bad data
         missing = np.any(pd.isnull(input_data),axis=1)
@@ -68,6 +96,7 @@ class Data_Cleaner:
         input_data = input_data.drop(bad_data_idx)
         
         output_data = input_data.reset_index(drop=True)
+        
         
         return output_data
         
@@ -115,12 +144,6 @@ class Data_Cleaner:
         output_data = input_data.drop(input_data.columns[0], axis=1).to_numpy()
         return output_data
     
-#    def data_prep_naive(self, input_data, dataset_name):
-#        self.data_report(input_data, dataset_name)
-#        cleaned_data = self.clean_data(input_data)
-#        final_data = self.cat_to_num(cleaned_data)
-#        print(final_data.iloc[0:9,:])
-#        return final_data
         
         
         

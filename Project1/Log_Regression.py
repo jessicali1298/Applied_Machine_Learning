@@ -17,10 +17,12 @@ class Log_Regression:
         N,m = X.shape
     #    th = 1/(1+np.exp(-np.dot(w.T, X)))
         th = self.logistic(X, w.T)
+#        print("sigmoid: ", th)
     #    th = logistic(np.dot(X,w))
         grad = (1/N) * np.dot(X.T, th-y)
         return grad
     
+    # using epsilon as stopping criteria
     def gradientDescent(self, X, y, a, end_cond):
         N,m = X.shape
         w = np.zeros(m)
@@ -32,20 +34,47 @@ class Log_Regression:
             w = w - a*g
         return w
     
+    # using num. of iterations as stopping criteria
+    def gradientDescent_iter(self, X, y, a, num_iter):
+        N,m = X.shape
+        w = np.zeros(m)
+        
+        g = np.inf
+        i = 0
+        while i < num_iter:
+            g = self.gradient(X,y,w)
+            w = w - a*g
+            i = i+1
+        return w
     
     def logistic(self,input1, input2):
-            ans = 1/(1+np.exp(-np.dot(input1, input2)))
-            return ans
+        z = np.dot(input1, input2)
+        
+        pos_num = np.where(z>=0)[0]
+        neg_num = np.where(z<0)[0]
+        
+        ans = np.empty(z.shape[0])
+        
+        ans[pos_num] = 1/(1+np.exp(-z[pos_num]))
+        ans[neg_num] = np.exp(z[neg_num])/(1+np.exp(z[neg_num]))
+
+        return ans
     
         
     def fit(self, X, y, a, end_cond):
-        #CODE
         # N = number of instances, m = number of features
         N,m = X.shape
         
         w = self.gradientDescent(X, y, a, end_cond)
         self.weight = w
     
+    # fit using number of iterations as stopping criteria for gradient descent
+    def fit_iter(self, X, y, a, num_iter):
+        N,m = X.shape
+        
+        w = self.gradientDescent_iter(X, y, a, num_iter)
+        self.weight = w
+        
     def predict(self, X):
         #CODE
         N,m = X.shape

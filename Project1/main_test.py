@@ -5,14 +5,13 @@ import Data_Cleaner as cd
 import Log_Regression as lgr
 import Naive_Bayes as nb
 import Cross_Validation as cv
-import operator
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 
 
 
-root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
-#root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
+#root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
+root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
 #root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
 
 
@@ -36,6 +35,27 @@ def split_y(input_data):
     
     return y, output_data
 
+def test_diff_a(a_arr, input_data):
+    log_score_ls = []
+    sk_log_score_ls = []
+    
+    for j in range(a_arr.shape[0]):
+        log_acc, sk_log_acc = cvo.log_k_fold(5,input_data,a_arr[j],0.01)
+        log_score_ls.append(log_acc)
+        sk_log_score_ls.append(sk_log_acc)
+        
+    return log_score_ls, sk_log_score_ls
+
+def test_diff_iter(iter_arr, input_data):
+    log_score_ls = []
+    sk_log_score_ls = []
+    
+    for j in range(iter_arr.shape[0]):
+        log_acc, sk_log_acc = cvo.log_k_fold_iter(5, input_data, 0.1, iter_arr[j])
+        log_score_ls.append(log_acc)
+        sk_log_score_ls.append(sk_log_acc)
+        
+    return log_score_ls, sk_log_score_ls
 #%%
 # create DataCleaner object
 dc = cd.Data_Cleaner()
@@ -52,15 +72,34 @@ dataset4_clean = dc.data_prep(dataset4, 'DATASET4--MACHINES')
 
 #----------DATASET1 does not need to be modified anymore after data_prep()-------
 
-#------------------------further modification of DATASET3------------------------
+#-----------------------------DATASET2 MODIFICATION------------------------------
+# normalize columns 1,3,11 (0,2,10)
+col_1 = dc.normalize(dataset2_clean.iloc[:,1])
+col_3 = dc.normalize(dataset2_clean.iloc[:,3])
+col_11 = dc.normalize(dataset2_clean.iloc[:,11])
+col_13 = dc.normalize(dataset2_clean.iloc[:,13])
+
+dataset2_clean.iloc[:,1] = col_1
+dataset2_clean.iloc[:,3] = col_3
+dataset2_clean.iloc[:,11] = col_11
+dataset2_clean.iloc[:,13] = col_13
+
+
+#-----------------------------DATASET3 MODIFICATION------------------------------
 # - change 7th feature's datatype from str to int64
 dataset3_clean.astype({6: 'int64'})
 
 # - drop 1st feature, which is the sample ID name
-dataset3_clean = dataset3_clean.drop(dataset3_clean.columns[0], axis=1)
+dataset3_clean = dataset3_clean.drop(columns = {dataset3_clean.columns[1]})
+
+codes, uniques = pd.factorize(dataset3_clean.iloc[:,dataset3_clean.columns[-1]])
+            
+# change labels to 0 and 1
+dataset3_clean.iloc[:,dataset3_clean.columns[-1]] = codes
 
 
-#------------------------further modifications of DATASET4-----------------------
+
+#-----------------------------DATASET4 MODIFICATION------------------------------
 # - define a binary class for the dataset: PRP>50, PRP<=50
 class_0_idx = np.where(dataset4_clean[8] <= 50)[0]
 class_1_idx = np.where(dataset4_clean[8] > 50)[0]
@@ -76,7 +115,31 @@ dataset4_clean.update(new_df)
 
 # - drop 1st, 2nd, and last features, which are vendor name, model name, and estimated relative performance
 dataset4_clean = dataset4_clean.drop(columns = {0,1,9})
-print(dataset4_clean.iloc[0:20,:])
+
+
+# normalize columns 2,3,4,5,6,7
+col_1 = dc.normalize(dataset4_clean.iloc[:,1])
+col_2 = dc.normalize(dataset4_clean.iloc[:,2])
+col_3 = dc.normalize(dataset4_clean.iloc[:,3])
+col_4 = dc.normalize(dataset4_clean.iloc[:,4])
+col_5 = dc.normalize(dataset4_clean.iloc[:,5])
+col_6 = dc.normalize(dataset4_clean.iloc[:,6])
+
+dataset4_clean.iloc[:,1] = col_1
+dataset4_clean.iloc[:,2] = col_2
+dataset4_clean.iloc[:,3] = col_3
+dataset4_clean.iloc[:,4] = col_4
+dataset4_clean.iloc[:,5] = col_5
+dataset4_clean.iloc[:,6] = col_6
+
+
+
+#--------------------------------------------------------------------------------
+# compute and output stats for each dataset
+stats_1 = dc.data_stats(dataset1_clean)
+stats_2 = dc.data_stats(dataset2_clean)
+stats_3 = dc.data_stats(dataset3_clean)
+stats_4 = dc.data_stats(dataset4_clean)
 
 
 
@@ -88,97 +151,23 @@ dataset2_arr_naive = dc.data_prep_naive(dataset2_clean)
 dataset2_arr_test_naive = dc.data_prep_naive(dataset2_clean_test)
 dataset3_arr_naive = dc.data_prep_naive(dataset3_clean)
 dataset4_arr_naive = dc.data_prep_naive(dataset4_clean)
-#print(dataset1_arr_naive[0:20,:])
-#print(dataset1_arr_naive.shape)
-
 
 
 #%%
-# 1. extract labels (y) from dataset for LOG REG
-# 2. delete labels column from dataset (keeps all features)
-y1, dataset1_log = split_y(dataset1_clean)
-y2, dataset2_log = split_y(dataset2_clean)
-y2_test, dataset2_test_log = split_y(dataset2_clean_test)
-y3, dataset3_log = split_y(dataset3_clean)
-y4, dataset4_log = split_y(dataset4_clean)
+#------------------------------TEST LOGISTIC REGRESSION-----------------------------
+cvo = cv.Cross_Validation()
 
+#test single dataset
+log_score, sk_log_score = cvo.log_k_fold(5, dataset1_clean, 0.1, 0.01)
+#log_score, sk_log_score = cvo.log_k_fold_iter(5, dataset1_clean, 0.1, 1000)
 
-# change all LOG REG datasets to numpy arrays
-dataset1_arr = dataset1_log.to_numpy()
-dataset2_arr = dataset1_log.to_numpy()
-dataset2_arr_test = dataset2_clean_test.to_numpy()
-dataset3_arr = dataset3_log.to_numpy()
-dataset4_arr = dataset4_log.to_numpy()
+# test various learning rates alpha
+#a = np.array([0.0001, 0.01, 0.1, 2, 5])
+#log_score, sk_log_score = test_diff_a(a, dataset4_clean)
 
-
-
-#%%
-#--------------------------PREPARE TEST DATA--------------------------------
-# Add 1 to X in the front
-#shape0, shape1 = dataset1_arr.shape
-#train_data = dataset1_arr[np.arange(int(shape0/5*4))]
-#test_data = dataset1_arr[np.arange(int(shape0/5*4),shape0)]
-#train_y = y1[np.arange(int(shape0/5*4))]
-#test_y = y1[np.arange(int(shape0/5*4), shape0)]
-
-#shape0, shape1 = dataset2_arr.shape
-#train_data = dataset2_arr[np.arange(int(shape0/5*4))]
-#test_data = dataset2_arr[np.arange(int(shape0/5*4),shape0)]
-#train_y = y2[np.arange(int(shape0/5*4))]
-#test_y = y2[np.arange(int(shape0/5*4), shape0)]
-
-#shape0, shape1 = dataset3_arr.shape
-#train_data = dataset3_arr[np.arange(int(shape0/5*4))]
-#test_data = dataset3_arr[np.arange(int(shape0/5*4),shape0)]
-#train_y = y3[np.arange(int(shape0/5*4))]
-#test_y = y3[np.arange(int(shape0/5*4), shape0)]
-
-#shape0, shape1 = dataset4_arr.shape
-#train_data = dataset4_arr[np.arange(int(shape0/5*4))]
-#test_data = dataset4_arr[np.arange(int(shape0/5*4),shape0)]
-#train_y = y4[np.arange(int(shape0/5*4))]
-#test_y = y4[np.arange(int(shape0/5*4), shape0)]
-
-splited_sample = np.array_split(dataset4_arr, 5)
-test_data = splited_sample[0]
-train_data = np.concatenate((splited_sample[1:4]), axis=0)
-print(train_data.shape)
-
-
-
-splited_y = np.array_split(y4, 5)
-test_y = splited_y[0]
-train_y = np.concatenate((splited_y[1:4]), axis=0)
-print(train_y.shape)
-print(dataset4_arr.shape)
-print(y4.shape)
-
-
-#%%
-#--------------------TEST LOGISTIC REGRESSION-----------------
-#N,m = train_data.shape
-#
-## OUR MODEL
-#lg = lgr.Log_Regression(np.zeros(m))
-#lg.fit(train_data, train_y, 0.1, 0.01)
-#y_pred = lg.predict(test_data)
-#accuracy = lg.evaluate(test_y, y_pred)
-
-splited_log = cv.Cross_Validation.dataset_sep(dataset1_arr, 5)
-result_log = cv.Cross_Validation.k_fold_log(splited_log, 5)
-
-
-print("\n" + "result: ", result_log)
-
-# SK-LEARN
-clf = LogisticRegression()
-clf.fit(train_data, train_y)
-y_pred_ski = clf.predict(test_data)
-accuracy_ski = clf.score(test_data, test_y)
-
-print(accuracy)
-print(accuracy_ski)
-
+# test various number of iterations
+#num_iter = np.array([100,1000,5000,10000,15000])
+#log_score, sk_log_score = test_diff_iter(num_iter, dataset2_clean)
 
 
 
@@ -188,59 +177,56 @@ print(accuracy_ski)
 #----------------------------TEST NAIVE BAYES----------------------------
 # Test calculating class probabilities
 
-dataset = np.array([[3.393533211,2.331273381,0],
-	[3.110073483,1.781539638,0],
-	[1.343808831,3.368360954,0],
-	[3.582294042,4.67917911,0],
-	[2.280362439,2.866990263,0],
-	[7.423436942,4.696522875,1],
-	[5.745051997,3.533989803,1],
-	[9.172168622,2.511101045,1],
-	[7.792783481,3.424088941,1],
-	[7.939820817,0.791637231,1]])
-
-# OUR MODEL
-nbc = nb.Naive_Bayes()
-
-shape0, shape1 = dataset2_arr_test_naive.shape
-train_data_nb = dataset2_arr_test_naive[np.arange(int(shape0/5*4))]
-test_data_nb = dataset2_arr_test_naive[np.arange(int(shape0/5*4),shape0)]
-train_y_nb = y2[np.arange(int(shape0/5*4))]
-test_y_nb = y2[np.arange(int(shape0/5*4), shape0)]
-
-
-
-trainDataWithLable = np.append(train_data_nb,train_y_nb.reshape(train_data_nb.shape[0],1),axis=1)
-print(trainDataWithLable)
-
-testDataWithLable = np.append(test_data_nb,test_y_nb.reshape(test_data_nb.shape[0],1),axis=1)
-#print(testDataWithLable)
-
-summaries = nbc.fit(trainDataWithLable)
-print("summaries",summaries)
-totalRows = trainDataWithLable.shape[0]
-print("total row",totalRows)
-#print("test_y", test_y.shape, "type",type(test_y))
-predicted = np.array([])
-lable = np.array([])
-
-for i in range(testDataWithLable.shape[0]):
-    prediction = nbc.predict(summaries, testDataWithLable[i], totalRows)
-    predicted = np.append(predicted, max(prediction.items(), key=operator.itemgetter(1))[0])
-    lable = np.append(lable, testDataWithLable[i][-1])
-comparison = nbc.evaluate(lable, predicted)
-print("accuracy of implementation",comparison)
- 
-# SKLEARN
-clf_nb = GaussianNB()
-clf_nb.fit(train_data, train_y)
-y_pred_ski_nb = clf.predict(test_data)
-accuracy_ski_nb = clf.score(test_data, test_y)
-
-print(accuracy_ski_nb)
-
-
-
+#dataset = np.array([[3.393533211,2.331273381,0],
+#	[3.110073483,1.781539638,0],
+#	[1.343808831,3.368360954,0],
+#	[3.582294042,4.67917911,0],
+#	[2.280362439,2.866990263,0],
+#	[7.423436942,4.696522875,1],
+#	[5.745051997,3.533989803,1],
+#	[9.172168622,2.511101045,1],
+#	[7.792783481,3.424088941,1],
+#	[7.939820817,0.791637231,1]])
+#
+## OUR MODEL
+#nbc = nb.Naive_Bayes()
+#
+#shape0, shape1 = dataset2_arr_test_naive.shape
+#train_data_nb = dataset2_arr_test_naive[np.arange(int(shape0/5*4))]
+#test_data_nb = dataset2_arr_test_naive[np.arange(int(shape0/5*4),shape0)]
+#train_y_nb = y2[np.arange(int(shape0/5*4))]
+#test_y_nb = y2[np.arange(int(shape0/5*4), shape0)]
+#
+#
+#
+#trainDataWithLable = np.append(train_data_nb,train_y_nb.reshape(train_data_nb.shape[0],1),axis=1)
+#print(trainDataWithLable)
+#
+#testDataWithLable = np.append(test_data_nb,test_y_nb.reshape(test_data_nb.shape[0],1),axis=1)
+##print(testDataWithLable)
+#
+#summaries = nbc.fit(trainDataWithLable)
+#print("summaries",summaries)
+#totalRows = trainDataWithLable.shape[0]
+#print("total row",totalRows)
+##print("test_y", test_y.shape, "type",type(test_y))
+#predicted = np.array([])
+#lable = np.array([])
+#
+#for i in range(testDataWithLable.shape[0]):
+#    prediction = nbc.predict(summaries, testDataWithLable[i], totalRows)
+#    predicted = np.append(predicted, max(prediction.items(), key=operator.itemgetter(1))[0])
+#    lable = np.append(lable, testDataWithLable[i][-1])
+#comparison = nbc.evaluate(lable, predicted)
+#print("accuracy of implementation",comparison)
+# 
+## SKLEARN
+#clf_nb = GaussianNB()
+#clf_nb.fit(train_data, train_y)
+#y_pred_ski_nb = clf.predict(test_data)
+#accuracy_ski_nb = clf.score(test_data, test_y)
+#
+#print(accuracy_ski_nb)
 
 
 

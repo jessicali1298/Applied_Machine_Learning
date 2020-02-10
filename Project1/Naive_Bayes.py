@@ -38,7 +38,7 @@ class Naive_Bayes:
     		probabilities[category] = np.log(summaries[category][0][-1]/float(totalRowsInDataset)) # this adds the prior (always the first row cause they should be the same for all)
     		for i in range(len(classSummaries)):
     			mean, stdev, count = classSummaries[i]
-    			if not isnan((self.calculateProbability(row[i], mean, stdev))):
+    			if not np.isnan((self.calculateProbability(row[i], mean, stdev))):
     			  probabilities[category] += np.log(self.calculateProbability(row[i], mean, stdev))
     	return probabilities
     
