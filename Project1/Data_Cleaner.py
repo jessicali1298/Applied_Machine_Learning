@@ -22,14 +22,16 @@ class Data_Cleaner:
         malformed = np.unique(np.where((input_data == '?'))[0])
         print('\nMALFORMED instances: ', '\n', malformed)
         
-        # 5. number of pos. and neg. classes
-        counts = input_data.iloc[:,input_data.shape[1]-1].value_counts()
-        print('\n# of binary classifications: ', '\n', counts)
+        
     
         
         
     #%%
     def data_stats(self, input_data):
+        # 5. number of pos. and neg. classes
+        counts = input_data.iloc[:,input_data.shape[1]-1].value_counts()
+        print('\n# of binary classifications: ', '\n', counts)
+              
         # 6. Distribution of numerical features (min, max, mean, range)
         data_types = input_data.dtypes
         numeric_feature_idx = np.where((data_types == int) | (data_types == float))[0]

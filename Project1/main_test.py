@@ -210,8 +210,8 @@ dataset = np.array([[3.393533211,2.331273381,0],
 nbc = nb.Naive_Bayes()
 
 splited_naive = np.array_split(dataset1_arr_naive, 5)
-testDataWithLabel = splited_naive[0]
-trainDataWithLabel = np.concatenate(np.delete(splited_naive,0,0),axis=0)
+testDataWithLable = splited_naive[0]
+trainDataWithLable = np.concatenate(np.delete(splited_naive,0,0),axis=0)
 
 
 summaries = nbc.fit(trainDataWithLable)
