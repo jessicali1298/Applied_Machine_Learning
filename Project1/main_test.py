@@ -11,8 +11,8 @@ from sklearn.naive_bayes import GaussianNB
 
 
 #root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
-root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
-#root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
+#root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
+root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
 
 
 path1 = root_path + 'dataset1/ionosphere.data'
@@ -146,11 +146,11 @@ stats_4 = dc.data_stats(dataset4_clean)
 #%%
 #------DATA CLEANING for NAIVE BAYES (are numpy arrays after data_prep_naive())--------
 # does not contain extra column of 1s, features and labels are put together
-dataset1_arr_naive = dc.data_prep_naive(dataset1_clean)
+dataset1_arr_naive = dataset1_clean.drop(dataset1_clean.columns[0], axis=1).to_numpy()
 dataset2_arr_naive = dc.data_prep_naive(dataset2_clean)
 dataset2_arr_test_naive = dc.data_prep_naive(dataset2_clean_test)
 dataset3_arr_naive = dc.data_prep_naive(dataset3_clean)
-dataset4_arr_naive = dc.data_prep_naive(dataset4_clean)
+dataset4_arr_naive = dataset4_clean.drop(dataset4_clean.columns[0], axis=1).to_numpy()
 
 
 #%%
@@ -203,35 +203,37 @@ dataset = np.array([[3.393533211,2.331273381,0],
 #
 #testDataWithLable = np.append(test_data_nb,test_y_nb.reshape(test_data_nb.shape[0],1),axis=1)
 ##print(testDataWithLable)
-    
+import operator
     
 
 # OUR MODEL
 nbc = nb.Naive_Bayes()
+
 
 splited_naive = np.array_split(dataset1_arr_naive, 5)
 testDataWithLable = splited_naive[0]
 trainDataWithLable = np.concatenate(np.delete(splited_naive,0,0),axis=0)
 
 
-summaries = nbc.fit(trainDataWithLable)
+
+summaries = nbc.fit(trainDataWithLabel)
 print("summaries",summaries)
-totalRows = trainDataWithLable.shape[0]
+totalRows = trainDataWithLabel.shape[0]
 print("total row",totalRows)
 #print("test_y", test_y.shape, "type",type(test_y))
 predicted = np.array([])
 lable = np.array([])
 
-for i in range(testDataWithLable.shape[0]):
-    prediction = nbc.predict(summaries, testDataWithLable[i], totalRows)
+for i in range(testDataWithLabel.shape[0]):
+    prediction = nbc.predict(summaries, testDataWithLabel[i], totalRows)
     predicted = np.append(predicted, max(prediction.items(), key=operator.itemgetter(1))[0])
-    lable = np.append(lable, testDataWithLable[i][-1])
+    lable = np.append(lable, testDataWithLabel[i][-1])
 comparison = nbc.evaluate(lable, predicted)
 print("accuracy of implementation",comparison)
  
 # SKLEARN
 # split data for SKlearn's inputs
-y1, sk_data1 = cvo.split_y(dataset1_clean)
+y1, sk_data1 = cvo.split_y(dataset4_clean)
 sk_data1_arr = sk_data1.to_numpy()
 
 splited_y = np.array_split(y1, 5)
@@ -246,8 +248,8 @@ train_data = np.concatenate(np.delete(splited_data,0,0), axis=0)
 #test SKLEARN
 clf_nb = GaussianNB()
 clf_nb.fit(train_data, train_y)
-y_pred_ski_nb = clf.predict(test_data)
-accuracy_ski_nb = clf.score(test_data, test_y)
+y_pred_ski_nb = clf_nb.predict(test_data)
+accuracy_ski_nb = clf_nb.score(test_data, test_y)
 
 print(accuracy_ski_nb)
 
