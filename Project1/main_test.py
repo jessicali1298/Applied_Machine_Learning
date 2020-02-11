@@ -11,8 +11,13 @@ from sklearn.naive_bayes import GaussianNB
 
 
 #root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
+<<<<<<< HEAD
 #root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
 root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
+=======
+root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
+#root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
+>>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
 
 
 path1 = root_path + 'dataset1/ionosphere.data'
@@ -145,6 +150,7 @@ stats_4 = dc.data_stats(dataset4_clean)
 
 #%%
 <<<<<<< HEAD
+<<<<<<< HEAD
 #--------------------------PREPARE TEST DATA--------------------------------
 # Add 1 to X in the front
 shape0, shape1 = dataset1_arr.shape
@@ -179,6 +185,8 @@ print(accuracy)
 
 #print("\n" + "result: ", result_log)
 =======
+=======
+>>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
 #------DATA CLEANING for NAIVE BAYES (are numpy arrays after data_prep_naive())--------
 # does not contain extra column of 1s, features and labels are put together
 dataset1_arr_naive = dataset1_clean.drop(dataset1_clean.columns[0], axis=1).to_numpy()
@@ -187,12 +195,16 @@ dataset2_arr_test_naive = dc.data_prep_naive(dataset2_clean_test)
 dataset3_arr_naive = dc.data_prep_naive(dataset3_clean)
 dataset4_arr_naive = dataset4_clean.drop(dataset4_clean.columns[0], axis=1).to_numpy()
 
+<<<<<<< HEAD
 >>>>>>> c24273cf9ba4758ff3487f9ad6ffd0261c8cb4c0
+=======
+>>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
 
 #%%
 #------------------------------TEST LOGISTIC REGRESSION-----------------------------
 cvo = cv.Cross_Validation()
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 #print(accuracy)
 print(accuracy_ski)
@@ -201,6 +213,11 @@ print(accuracy_ski)
 log_score, sk_log_score = cvo.log_k_fold(5, dataset1_clean, 0.1, 0.01)
 #log_score, sk_log_score = cvo.log_k_fold_iter(5, dataset1_clean, 0.1, 1000)
 >>>>>>> c24273cf9ba4758ff3487f9ad6ffd0261c8cb4c0
+=======
+#test single dataset
+#log_score, sk_log_score = cvo.log_k_fold(5, dataset1_clean, 0.1, 0.01, 0)
+log_score, sk_log_score = cvo.log_k_fold_iter(5, dataset1_clean, 0.1, 1500, 2.3)
+>>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
 
 # test various learning rates alpha
 #a = np.array([0.0001, 0.01, 0.1, 2, 5])
@@ -252,8 +269,13 @@ nbc = nb.Naive_Bayes()
 
 
 splited_naive = np.array_split(dataset1_arr_naive, 5)
+<<<<<<< HEAD
 testDataWithLable = splited_naive[0]
 trainDataWithLable = np.concatenate(np.delete(splited_naive,0,0),axis=0)
+=======
+testDataWithLabel = splited_naive[0]
+trainDataWithLabel = np.concatenate(np.delete(splited_naive,0,0),axis=0)
+>>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
 
 
 

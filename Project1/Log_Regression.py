@@ -23,11 +23,15 @@ class Log_Regression:
         return grad
     
     # using epsilon as stopping criteria
+<<<<<<< HEAD
 <<<<<<< HEAD:Project1 10.56.32 AM/Log_Regression.py
     def gradientDescent(self, X, y, a, end_cond):
 =======
     def gradientDescent(self, X, y, a, end_cond, lamda):
 >>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb:Project1/Log_Regression.py
+=======
+    def gradientDescent(self, X, y, a, end_cond, lamda):
+>>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
         N,m = X.shape
         w = np.zeros(m)
         
@@ -40,11 +44,15 @@ class Log_Regression:
         return w
     
     # using num. of iterations as stopping criteria
+<<<<<<< HEAD
 <<<<<<< HEAD:Project1 10.56.32 AM/Log_Regression.py
     def gradientDescent_iter(self, X, y, a, num_iter):
 =======
     def gradientDescent_iter(self, X, y, a, num_iter, lamda):
 >>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb:Project1/Log_Regression.py
+=======
+    def gradientDescent_iter(self, X, y, a, num_iter, lamda):
+>>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
         N,m = X.shape
         w = np.zeros(m)
         
@@ -52,12 +60,17 @@ class Log_Regression:
         i = 0
         while i < num_iter:
             g = self.gradient(X,y,w)
+<<<<<<< HEAD
 <<<<<<< HEAD:Project1 10.56.32 AM/Log_Regression.py
             w = w - a*g
 =======
 #            w = w - a*g 
             w = w - a*(g + (1/N)*lamda*w)
 >>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb:Project1/Log_Regression.py
+=======
+#            w = w - a*g 
+            w = w - a*(g + (1/N)*lamda*w)
+>>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
             i = i+1
         return w
     
@@ -75,11 +88,15 @@ class Log_Regression:
         return ans
     
         
+<<<<<<< HEAD
 <<<<<<< HEAD:Project1 10.56.32 AM/Log_Regression.py
     def fit(self, X, y, a, end_cond):
 =======
     def fit(self, X, y, a, end_cond, lamda):
 >>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb:Project1/Log_Regression.py
+=======
+    def fit(self, X, y, a, end_cond, lamda):
+>>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
         # N = number of instances, m = number of features
         N,m = X.shape
         
@@ -87,17 +104,23 @@ class Log_Regression:
         self.weight = w
     
     # fit using number of iterations as stopping criteria for gradient descent
+<<<<<<< HEAD
 <<<<<<< HEAD:Project1 10.56.32 AM/Log_Regression.py
     def fit_iter(self, X, y, a, num_iter):
         N,m = X.shape
         
         w = self.gradientDescent_iter(X, y, a, num_iter)
 =======
+=======
+>>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
     def fit_iter(self, X, y, a, num_iter, lamda):
         N,m = X.shape
         
         w = self.gradientDescent_iter(X, y, a, num_iter, lamda)
+<<<<<<< HEAD
 >>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb:Project1/Log_Regression.py
+=======
+>>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
         self.weight = w
         
     def predict(self, X):
