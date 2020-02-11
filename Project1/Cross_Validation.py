@@ -37,7 +37,7 @@ class Cross_Validation:
         
         
         
-    def log_k_fold(self, k, dataset, a, epsilon):
+    def log_k_fold(self, k, dataset, a, epsilon, lamda):
         # shuffle the dataset
         dataset_shuffle = dataset.sample(frac=1).reset_index(drop = True)
         
@@ -73,7 +73,7 @@ class Cross_Validation:
             N,m = train_data.shape
         
             lg = lgr.Log_Regression(np.zeros(m))
-            lg.fit(train_data, train_y, a, epsilon)
+            lg.fit(train_data, train_y, a, epsilon, lamda)
             y_pred = lg.predict(test_data)
             accuracy, precision, recall = self.score(test_y, y_pred)
 
@@ -98,7 +98,7 @@ class Cross_Validation:
             
         return score_log, score_sk
     
-    def log_k_fold_iter(self,k, dataset, a, num_iter):
+    def log_k_fold_iter(self,k, dataset, a, num_iter, lamda):
         # shuffle the dataset
         dataset_shuffle = dataset.sample(frac=1).reset_index(drop = True)
         
@@ -134,7 +134,7 @@ class Cross_Validation:
             N,m = train_data.shape
         
             lg = lgr.Log_Regression(np.zeros(m))
-            lg.fit_iter(train_data, train_y, a, num_iter)
+            lg.fit_iter(train_data, train_y, a, num_iter, lamda)
             y_pred = lg.predict(test_data)
             accuracy, precision, recall = self.score(test_y, y_pred)
 

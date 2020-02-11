@@ -11,8 +11,8 @@ from sklearn.naive_bayes import GaussianNB
 
 
 #root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project1/'
-#root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
-root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
+root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project1/'
+#root_path = '/Users/kirenrao/Documents/GitHub/Applied_Machine_Learning/Project1/'
 
 
 path1 = root_path + 'dataset1/ionosphere.data'
@@ -158,8 +158,8 @@ dataset4_arr_naive = dataset4_clean.drop(dataset4_clean.columns[0], axis=1).to_n
 cvo = cv.Cross_Validation()
 
 #test single dataset
-log_score, sk_log_score = cvo.log_k_fold(5, dataset1_clean, 0.1, 0.01)
-#log_score, sk_log_score = cvo.log_k_fold_iter(5, dataset1_clean, 0.1, 1000)
+#log_score, sk_log_score = cvo.log_k_fold(5, dataset1_clean, 0.1, 0.01, 0)
+log_score, sk_log_score = cvo.log_k_fold_iter(5, dataset1_clean, 0.1, 1500, 2.3)
 
 # test various learning rates alpha
 #a = np.array([0.0001, 0.01, 0.1, 2, 5])
@@ -211,8 +211,8 @@ nbc = nb.Naive_Bayes()
 
 
 splited_naive = np.array_split(dataset1_arr_naive, 5)
-testDataWithLable = splited_naive[0]
-trainDataWithLable = np.concatenate(np.delete(splited_naive,0,0),axis=0)
+testDataWithLabel = splited_naive[0]
+trainDataWithLabel = np.concatenate(np.delete(splited_naive,0,0),axis=0)
 
 
 
