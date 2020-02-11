@@ -37,11 +37,7 @@ class Cross_Validation:
         
         
         
-<<<<<<< HEAD
-    def log_k_fold(self, k, dataset, a, epsilon):
-=======
     def log_k_fold(self, k, dataset, a, epsilon, lamda):
->>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
         # shuffle the dataset
         dataset_shuffle = dataset.sample(frac=1).reset_index(drop = True)
         
@@ -77,11 +73,7 @@ class Cross_Validation:
             N,m = train_data.shape
         
             lg = lgr.Log_Regression(np.zeros(m))
-<<<<<<< HEAD
-            lg.fit(train_data, train_y, a, epsilon)
-=======
             lg.fit(train_data, train_y, a, epsilon, lamda)
->>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
             y_pred = lg.predict(test_data)
             accuracy, precision, recall = self.score(test_y, y_pred)
 
@@ -106,11 +98,7 @@ class Cross_Validation:
             
         return score_log, score_sk
     
-<<<<<<< HEAD
-    def log_k_fold_iter(self,k, dataset, a, num_iter):
-=======
     def log_k_fold_iter(self,k, dataset, a, num_iter, lamda):
->>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
         # shuffle the dataset
         dataset_shuffle = dataset.sample(frac=1).reset_index(drop = True)
         
@@ -131,13 +119,6 @@ class Cross_Validation:
         recall_ls_sk = []
         
         for i in range(k):
-<<<<<<< HEAD
-<<<<<<< HEAD
-            train_label, train_data = Cross_Validation.split_y_array(dataset[i][0])
-            test_label, test_data = Cross_Validation.split_y_array(dataset[i][1])
-=======
-=======
->>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
             # copy the datasets so the original data will not be messed up
             copy_sample = np.copy(splited_sample)
             copy_y = np.copy(splited_y)
@@ -150,45 +131,10 @@ class Cross_Validation:
             train_y = np.concatenate(np.delete(copy_y,i,0), axis=0)
             
             # OUR MODEL
-<<<<<<< HEAD
->>>>>>> c24273cf9ba4758ff3487f9ad6ffd0261c8cb4c0
-            N,m = train_data.shape
-        
-            lg = lgr.Log_Regression(np.zeros(m))
-<<<<<<< HEAD
-            lg.fit(train_data, train_label, 0.1, 0.01)
-            pred_label = lg.predict(test_data)
-            for n in range (len(test_label)):
-                if test_label == 1  and pred_label == 1:
-                    true_pos = true_pos + 1
-                if test_label == 1 and pred_label == 0:
-                    false_pos = false_pos + 1
-                if test_label == 0 and pred_label == 0:
-                    true_neg = true_neg + 1
-                if test_label == 0 and pred_label == 1:
-                    false_neg = false_neg + 1
-            accuracy = (true_pos + true_neg) / (true_pos + true_neg + false_pos + false_neg)
-            precision = true_pos / (true_pos + false_pos)
-            recall = true_pos / (true_pos + false_neg)
-            result.append(['accuracy'+str(i)+': ', accuracy, 'precision'+str(i)+': ', precision, 'recall'++str(i)+': ', recall])
-            print('\n', 'accuracy'+str(i)+': ', accuracy, 'precision'+str(i)+': ', precision, 'recall'++str(i)+': ', recall)
-            accuracy = 0
-            recall = 0
-            precision = 0
-            true_pos = 0
-            true_neg = 0
-            false_pos = 0
-            false_neg = 0
-        return result
-    
-=======
-            lg.fit_iter(train_data, train_y, a, num_iter)
-=======
             N,m = train_data.shape
         
             lg = lgr.Log_Regression(np.zeros(m))
             lg.fit_iter(train_data, train_y, a, num_iter, lamda)
->>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
             y_pred = lg.predict(test_data)
             accuracy, precision, recall = self.score(test_y, y_pred)
 
@@ -201,10 +147,6 @@ class Cross_Validation:
             clf.fit(train_data, train_y)
             y_pred_sk = clf.predict(test_data)
             accuracy_sk, precision_sk, recall_sk = self.score(test_y, y_pred_sk)
-<<<<<<< HEAD
->>>>>>> c24273cf9ba4758ff3487f9ad6ffd0261c8cb4c0
-=======
->>>>>>> dc964e57c48095b31c9e93b46a0c0c97b7b487bb
             
             accuracy_ls_sk.append(accuracy_sk)
             precision_ls_sk.append(precision_sk)
