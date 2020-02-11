@@ -85,7 +85,7 @@ class Cross_Validation:
             clf = LogisticRegression()
             clf.fit(train_data, train_y)
             y_pred_sk = clf.predict(test_data)
-            print(clf.score(test_data, test_y))
+            print(i, ':', clf.score(test_data, test_y))
             accuracy_sk, precision_sk, recall_sk = self.score(test_y, y_pred_sk)
             
             accuracy_ls_sk.append(accuracy_sk)
@@ -146,6 +146,67 @@ class Cross_Validation:
             clf = LogisticRegression()
             clf.fit(train_data, train_y)
             y_pred_sk = clf.predict(test_data)
+            accuracy_sk, precision_sk, recall_sk = self.score(test_y, y_pred_sk)
+            
+            accuracy_ls_sk.append(accuracy_sk)
+            precision_ls_sk.append(precision_sk)
+            recall_ls_sk.append(recall_sk)
+            
+            # create two score dictionaries
+            score_log = {'accuracy': accuracy_ls, 'precision': precision_ls, 'recall': recall_ls} 
+            score_sk = {'accuracy': accuracy_ls_sk, 'precision': precision_ls_sk, 'recall': recall_ls_sk} 
+            
+        return score_log, score_sk
+    
+    def naive_k_fold(self, k, dataset, a, epsilon, lamda):
+        # shuffle the dataset
+        dataset_shuffle = dataset.sample(frac=1).reset_index(drop = True)
+        
+        # separate labels from features
+        y, dataset_log = self.split_y(dataset_shuffle)
+        dataset_arr = dataset_log.to_numpy()
+        
+        # split dataset into k folds
+        splited_sample = np.array_split(dataset_arr, k)
+        splited_y = np.array_split(y, k)
+        
+        # begin evaluation
+        accuracy_ls = []
+        precision_ls = []
+        recall_ls = []
+        accuracy_ls_sk = []
+        precision_ls_sk = []
+        recall_ls_sk = []
+        
+        for i in range(k):
+            # copy the datasets so the original data will not be messed up
+            copy_sample = np.copy(splited_sample)
+            copy_y = np.copy(splited_y)
+            
+            # define test data and train data
+            test_data = copy_sample[i]
+            test_y = copy_y[i]
+                
+            train_data = np.concatenate(np.delete(copy_sample,i,0), axis=0)
+            train_y = np.concatenate(np.delete(copy_y,i,0), axis=0)
+            
+            # OUR MODEL
+            N,m = train_data.shape
+        
+            lg = lgr.Log_Regression(np.zeros(m))
+            lg.fit(train_data, train_y, a, epsilon, lamda)
+            y_pred = lg.predict(test_data)
+            accuracy, precision, recall = self.score(test_y, y_pred)
+
+            accuracy_ls.append(accuracy)
+            precision_ls.append(precision)
+            recall_ls.append(recall)
+        
+            # SK-LEARN
+            clf = LogisticRegression()
+            clf.fit(train_data, train_y)
+            y_pred_sk = clf.predict(test_data)
+            print(i, ':', clf.score(test_data, test_y))
             accuracy_sk, precision_sk, recall_sk = self.score(test_y, y_pred_sk)
             
             accuracy_ls_sk.append(accuracy_sk)
