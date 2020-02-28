@@ -5,8 +5,11 @@ import Data_Cleaner as cd
 import Log_Regression as lgr
 import Naive_Bayes as nb
 import Cross_Validation as cv
+import time 
+import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
+
 
 
 
@@ -36,22 +39,43 @@ def split_y(input_data):
     return y, output_data
 
 def test_diff_a(a_arr, input_data):
+    
     log_score_ls = []
     sk_log_score_ls = []
     
+    avg_acc_ls = []
+    avg_precision_ls = []
+    avg_recall_ls = []
+
+    time_array = []
+    my_time = 0
+    
+  
     for j in range(a_arr.shape[0]):
+        start =  time.time()
         log_acc, sk_log_acc = cvo.log_k_fold(5,input_data,a_arr[j],0.01, 0)
+        
+        avg_acc = np.mean(log_acc["accuracy"])
+        avg_recall = np.mean(log_acc["recall"])
+        avg_precision = np.mean(log_acc["precision"])
+
+        avg_acc_ls.append(avg_acc)
+        avg_precision_ls.append(avg_precision)
+        avg_recall_ls.append(avg_recall)
+
         log_score_ls.append(log_acc)
         sk_log_score_ls.append(sk_log_acc)
-        
-    return log_score_ls, sk_log_score_ls
+        my_time = time.time() - start
+        time_array.append(my_time)
+        print(my_time)
+    return log_score_ls, sk_log_score_ls, time_array, avg_acc_ls, avg_precision_ls, avg_recall_ls
 
 def test_diff_iter(iter_arr, input_data):
     log_score_ls = []
     sk_log_score_ls = []
     
     for j in range(iter_arr.shape[0]):
-        log_acc, sk_log_acc = cvo.log_k_fold_iter(5, input_data, 0.1, iter_arr[j])
+        log_acc, sk_log_acc = cvo.log_k_fold_iter(5, input_data, 0.1, iter_arr[j], 0)
         log_score_ls.append(log_acc)
         sk_log_score_ls.append(sk_log_acc)
         
@@ -158,105 +182,44 @@ dataset4_arr_naive = dataset4_clean.drop(dataset4_clean.columns[0], axis=1).to_n
 cvo = cv.Cross_Validation()
 
 #test single dataset
-#log_score, sk_log_score = cvo.log_k_fold(5, dataset3_clean, 0.1, 0.01, 0)
+log_score, sk_log_score = cvo.log_k_fold(5, dataset1_clean, 0.1, 0.01, 0)
+print('\n', 'Logistic Regression Cross Validation Evaluation: ', log_score)
 #log_score, sk_log_score = cvo.log_k_fold_iter(5, dataset3_clean, 0.1, 1500, 2)
-#print("log score: ", log_score, "\n", "sk log score: ", sk_log_score)
 
 # test various learning rates alpha
-a = np.array([0.0001, 0.01, 0.1, 2, 5])
-log_score, sk_log_score = test_diff_a(a, dataset4_clean)
+#a = np.array([0.0001, 0.01, 0.1, 2, 5])
+#log_score, sk_log_score, time_array, avg_acc, avg_prec, avg_recall = test_diff_a(a, dataset1_clean)
+
 
 # test various number of iterations
 #num_iter = np.array([100,1000,5000,10000,15000])
 #log_score, sk_log_score = test_diff_iter(num_iter, dataset2_clean)
 
 
+#------------------------------Plotting functions -----------------------------
 
-
+#plt.plot(a, time_array)
+#plt.title('Learning Rate v.s. Convergence Time (Dataset 1)')
+#plt.xlabel('learning rate(a)')
+#plt.ylabel('convergence time(t)')
+#plt.show()
+#
+#ax = plt.subplot(111)
+#ax.plot(a, avg_acc, label='avg_accuracy')
+#ax.plot(a, avg_prec, label='avg_precision')
+#ax.plot(a, avg_recall, label='avg_recall')
+#plt.title('Learning Rate v.s. Accuracy/Precision/Recall (Dataset 1)')
+#plt.legend()
+#plt.xlabel('learning rate(a)')
+#plt.ylabel('Accuracy/Precision/Recall')
+#plt.show()
 
 #%%
 #----------------------------TEST NAIVE BAYES----------------------------
-## Test calculating class probabilities
-#
-#dataset = np.array([[3.393533211,2.331273381,0],
-#	[3.110073483,1.781539638,0],
-#	[1.343808831,3.368360954,0],
-#	[3.582294042,4.67917911,0],
-#	[2.280362439,2.866990263,0],
-#	[7.423436942,4.696522875,1],
-#	[5.745051997,3.533989803,1],
-#	[9.172168622,2.511101045,1],
-#	[7.792783481,3.424088941,1],
-#	[7.939820817,0.791637231,1]])
-#
-#
-#
-##shape0, shape1 = dataset2_arr_naive.shape
-##train_data_nb = dataset2_arr_test_naive[np.arange(int(shape0/5*4))]
-##test_data_nb = dataset2_arr_test_naive[np.arange(int(shape0/5*4),shape0)]
-##train_y_nb = y2[np.arange(int(shape0/5*4))]
-##test_y_nb = y2[np.arange(int(shape0/5*4), shape0)]
-#
-#
-#
-##trainDataWithLable = np.append(train_data_nb,train_y_nb.reshape(train_data_nb.shape[0],1),axis=1)
-##print(trainDataWithLable)
-##
-##testDataWithLable = np.append(test_data_nb,test_y_nb.reshape(test_data_nb.shape[0],1),axis=1)
-###print(testDataWithLable)
-#import operator
-#    
-#
-## OUR MODEL
-#nbc = nb.Naive_Bayes()
-#
-#
-#splited_naive = np.array_split(dataset2_arr_naive, 5)
-#testDataWithLabel = splited_naive[0]
-#trainDataWithLabel = np.concatenate(np.delete(splited_naive,0,0),axis=0)
-#
-#
-#
-#summaries = nbc.fit(trainDataWithLabel)
-#print("summaries",summaries)
-#totalRows = trainDataWithLabel.shape[0]
-#print("total row",totalRows)
-##print("test_y", test_y.shape, "type",type(test_y))
-#predicted = np.array([])
-#lable = np.array([])
-#
-#for i in range(testDataWithLabel.shape[0]):
-#    prediction = nbc.predict(summaries, testDataWithLabel[i], totalRows)
-#    predicted = np.append(predicted, max(prediction.items(), key=operator.itemgetter(1))[0])
-#    lable = np.append(lable, testDataWithLabel[i][-1])
-#comparison = nbc.evaluate(lable, predicted)
-#print("accuracy of implementation",comparison)
-# 
-## SKLEARN
-## split data for SKlearn's inputs
-#y1, sk_data1 = cvo.split_y(dataset2_clean)
-#sk_data1_arr = sk_data1.to_numpy()
-#
-#splited_y = np.array_split(y1, 5)
-#splited_data = np.array_split(sk_data1_arr,5)
-#
-#test_y = splited_y[0]
-#train_y = np.concatenate(np.delete(splited_y,0,0),axis=0)
-#
-#test_data = splited_data[0]
-#train_data = np.concatenate(np.delete(splited_data,0,0), axis=0)
-#
-##test SKLEARN
-#clf_nb = GaussianNB()
-#clf_nb.fit(train_data, train_y)
-#y_pred_ski_nb = clf_nb.predict(test_data)
-#accuracy_ski_nb = clf_nb.score(test_data, test_y)
-#
-#print(accuracy_ski_nb)
-
-
-
-
-
+nb_score, sk_nb_score = cvo.naive_k_fold(5, dataset1_arr_naive)
+print('\n','Naive Bayes Cross Validation Evaluation: ', nb_score)
+#nb_score_nb, sk_nb_score = cvo.naive_k_fold(5, dataset1_arr_naive)
+#nb_score_nb, sk_nb_score = cvo.naive_k_fold(5, dataset2_arr_naive)
+#nb_score_nb, sk_nb_score = cvo.naive_k_fold(5, dataset3_arr_naive)
 
 

@@ -49,11 +49,7 @@ class Log_Regression:
         i = 0
         while i < num_iter:
             g = self.gradient(X,y,w)
-            w = w - a*g
 
-#            w = w - a*g 
-            w = w - a*(g + (1/N)*lamda*w)
-#            w = w - a*g 
             w = w - a*(g + (1/N)*lamda*w)
 
             i = i+1
