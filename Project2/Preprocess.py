@@ -14,7 +14,10 @@ nltk.download('stopwords')
 nltk.download('punkt')
 
 from sklearn.feature_extraction.text import TfidfVectorizer
-
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_validate
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
 
 #root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project2/'
@@ -89,8 +92,15 @@ for data in train_data:
 vectorizer = TfidfVectorizer(analyzer='word', tokenizer = dummy_tok, 
                              preprocessor = dummy_tok,
                              token_pattern = None) 
-X = vectorizer.fit_transform(result)
+X = vectorizer.fit_transform(result).toarray()
 features = vectorizer.get_feature_names()
+
+y = labels
+
+# Initialize the Classifier and start training
+RFC = RandomForestClassifier(n_estimators=300, random_state=0)
+cv_results = cross_validate(RFC, X, y, cv=5)
+print(cv_results['test_score'])
 
 
 
