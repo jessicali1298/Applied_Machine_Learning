@@ -29,22 +29,25 @@ def dummy_tok(input):
 
 #%%
 from sklearn.datasets import fetch_20newsgroups
-#twenty_train_all = fetch_20newsgroups(subset='train')
-#all_names = twenty_train_all.target_names
+twenty_train_all = fetch_20newsgroups(subset='train', shuffle=True, random_state=42)
+all_names = twenty_train_all.target_names
 #all_labels = np.unique(twenty_train_all.target)
-#
+
+train_data = twenty_train_all.data
+labels = twenty_train_all.target
+
 #print(twenty_train_all.data[0])
 #
-#print(all_names)
+print(all_names)
 #print(all_labels)
 
 
 # only test with a few groups
-categories = ['comp.graphics', 'sci.med']
-twenty_train = fetch_20newsgroups(subset='train', categories=categories, 
-                                  shuffle=True, random_state=42)
-train_data = twenty_train.data
-labels = twenty_train.target
+#categories = ['comp.graphics', 'sci.med']
+#twenty_train = fetch_20newsgroups(subset='train', categories=categories, 
+#                                  shuffle=True, random_state=42)
+#train_data = twenty_train.data
+#labels = twenty_train.target
 
 
 
