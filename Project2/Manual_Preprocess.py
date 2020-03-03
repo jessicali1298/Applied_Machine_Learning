@@ -117,6 +117,8 @@ vectorizer = TfidfVectorizer(analyzer='word', tokenizer = dummy_tok,
 
 X_all = vectorizer.fit_transform(result).toarray()
 #print(X_all.shape) #1963
+
+# Split data into training and testing
 X_train = X_all[0:len(train_data)]
 X_test = X_all[len(train_data):len(X_all)]
 
