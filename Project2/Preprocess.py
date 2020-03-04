@@ -18,33 +18,34 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
 
 #%%
-# import 20news dataset
+# Import 20news dataset
 from sklearn.datasets import fetch_20newsgroups
 
 #-----------------------test all 20 groups--------------------------------
-twenty_train = fetch_20newsgroups(subset='train', 
-                                  shuffle=True, random_state=42)
-twenty_test = fetch_20newsgroups(subset='test',
-                                 shuffle=True, random_state=42)
-twenty_all = fetch_20newsgroups(subset='all',
-                                 shuffle=True, random_state=42)
+#twenty_train = fetch_20newsgroups(subset='train', 
+#                                  shuffle=True, random_state=42)
+#twenty_test = fetch_20newsgroups(subset='test',
+#                                 shuffle=True, random_state=42)
+#twenty_all = fetch_20newsgroups(subset='all',
+#                                 shuffle=True, random_state=42)
 
 #-----------------------only test with a few groups------------------------
 categories = ['alt.atheism','comp.graphics', 'misc.forsale','rec.autos', 'sci.med',
               'soc.religion.christian','talk.politics.guns','talk.politics.mideast']
 #categories = ['comp.graphics', 'sci.med']
 
-#twenty_train = fetch_20newsgroups(subset='train', categories=categories, 
-#                                  shuffle=True, random_state=42)
-#twenty_test = fetch_20newsgroups(subset='test', categories=categories, 
-#                                 shuffle=True, random_state=42)
-#twenty_all = fetch_20newsgroups(subset='all', categories=categories, 
-#                                 shuffle=True, random_state=42)
+twenty_train = fetch_20newsgroups(subset='train', categories=categories, 
+                                  shuffle=True, random_state=42)
+twenty_test = fetch_20newsgroups(subset='test', categories=categories, 
+                                 shuffle=True, random_state=42)
+twenty_all = fetch_20newsgroups(subset='all', categories=categories, 
+                                 shuffle=True, random_state=42)
 
 train_data = twenty_train.data
 train_labels = twenty_train.target
@@ -58,15 +59,14 @@ all_labels = twenty_all.target
 
 
 #%%
+# Preprocess text info for training later
 analyzer = TfidfVectorizer().build_analyzer()
 stemmer= PorterStemmer()
 
 def stemmed_words(doc):
     return (stemmer.stem(w) for w in analyzer(doc))
 
-tfidf_vect = TfidfVectorizer(analyzer=stemmed_words, stop_words='english')
-
-
+tfidf_vect = TfidfVectorizer(analyzer='word', stop_words='english')
 
 
 # Initialize the vectorizers and classifiers
@@ -85,6 +85,7 @@ print(len(train_data))
 
 # Initialize the Classifier and start training
 RFC = RandomForestClassifier(n_estimators=300, random_state=0)
+adaBoost = AdaBoostClassifier(n_estimators=300, random_state=0)
 #cv_results = cross_validate(RFC, X, y, cv=5)
 #print(cv_results['test_score'])
 
@@ -92,7 +93,7 @@ RFC = RandomForestClassifier(n_estimators=300, random_state=0)
 from sklearn.pipeline import Pipeline
 text_clf = Pipeline([('vect', tfidf_vect),
 #                     ('tfidf', tfidf_transformer),
-                     ('clf', RFC)])
+                     ('clf', adaBoost)])
 text_clf.fit(train_data, train_labels)
 
 predicted = text_clf.predict(test_data)
