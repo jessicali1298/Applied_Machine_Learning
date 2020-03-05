@@ -34,12 +34,12 @@ from sklearn.datasets import fetch_20newsgroups
 
 #-----------------------only test with a few groups------------------------
 categories = ['comp.graphics', 'sci.med']
-twenty_train = fetch_20newsgroups(subset='train', categories=categories, 
-                                  shuffle=True, random_state=42)
-twenty_test = fetch_20newsgroups(subset='test', categories=categories, 
-                                 shuffle=True, random_state=42)
-twenty_all = fetch_20newsgroups(subset='all', categories=categories, 
-                                 shuffle=True, random_state=42)
+twenty_train = fetch_20newsgroups(subset='train', remove=('headers', 'footers', 'quotes'),
+                                  categories=categories, shuffle=True, random_state=42)
+twenty_test = fetch_20newsgroups(subset='test', remove=('headers', 'footers', 'quotes'),
+                                 categories=categories, shuffle=True, random_state=42)
+twenty_all = fetch_20newsgroups(subset='all', remove=('headers', 'footers', 'quotes'),
+                                categories=categories, shuffle=True, random_state=42)
 train_data = twenty_train.data
 train_labels = twenty_train.target
 
