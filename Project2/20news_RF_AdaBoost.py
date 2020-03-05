@@ -28,11 +28,11 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 from sklearn.datasets import fetch_20newsgroups
 
 #-----------------------test all 20 groups--------------------------------
-twenty_train = fetch_20newsgroups(subset='train', 
+twenty_train = fetch_20newsgroups(subset='train', remove=('headers', 'footers', 'quotes'),
                                   shuffle=True, random_state=42)
-twenty_test = fetch_20newsgroups(subset='test',
+twenty_test = fetch_20newsgroups(subset='test', remove=('headers', 'footers', 'quotes'),
                                  shuffle=True, random_state=42)
-twenty_all = fetch_20newsgroups(subset='all',
+twenty_all = fetch_20newsgroups(subset='all', remove=('headers', 'footers', 'quotes'),
                                  shuffle=True, random_state=42)
 
 #-----------------------only test with a few groups------------------------
@@ -41,12 +41,12 @@ twenty_all = fetch_20newsgroups(subset='all',
 #categories = ['alt.atheism','comp.graphics', 'rec.autos', 'sci.med']
 #categories = ['comp.graphics', 'sci.med']
 
-#twenty_train = fetch_20newsgroups(subset='train', categories=categories, 
-#                                  shuffle=True, random_state=42)
-#twenty_test = fetch_20newsgroups(subset='test', categories=categories, 
-#                                 shuffle=True, random_state=42)
-#twenty_all = fetch_20newsgroups(subset='all', categories=categories, 
-#                                 shuffle=True, random_state=42)
+#twenty_train = fetch_20newsgroups(subset='train', remove=('headers', 'footers', 'quotes'),
+#                                  categories=categories, shuffle=True, random_state=42)
+#twenty_test = fetch_20newsgroups(subset='test', remove=('headers', 'footers', 'quotes'),
+#                                 categories=categories, shuffle=True, random_state=42)
+#twenty_all = fetch_20newsgroups(subset='all', remove=('headers', 'footers', 'quotes'),
+#                                categories=categories, shuffle=True, random_state=42)
 
 train_data = twenty_train.data
 train_labels = twenty_train.target
@@ -87,7 +87,7 @@ print(len(train_data))
 # for manual classification without pipeline
 
 X_all = tfidf_vect.fit_transform(all_data).toarray()
-print(X_all.shape) #1963
+print(X_all.shape) 
 
 # Split data into training and testing
 X_train = X_all[0:len(train_data)]
@@ -102,7 +102,7 @@ adaBoost = AdaBoostClassifier(n_estimators=300, random_state=0)
 
 #%%
 
-# Perform grid search to find best parameters
+# Perform random search to find best parameters
 #from sklearn.model_selection import RandomizedSearchCV
 #
 ## Number of trees in random forest
