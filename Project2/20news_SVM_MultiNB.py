@@ -30,11 +30,11 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 from sklearn.datasets import fetch_20newsgroups
 
 #-----------------------test all 20 groups--------------------------------
-twenty_train = fetch_20newsgroups(subset='train', 
+twenty_train = fetch_20newsgroups(subset='train', remove=('headers', 'footers', 'quotes'),
                                   shuffle=True, random_state=42)
-twenty_test = fetch_20newsgroups(subset='test',
+twenty_test = fetch_20newsgroups(subset='test', remove=('headers', 'footers', 'quotes'),
                                  shuffle=True, random_state=42)
-twenty_all = fetch_20newsgroups(subset='all',
+twenty_all = fetch_20newsgroups(subset='all', remove=('headers', 'footers', 'quotes'),
                                  shuffle=True, random_state=42)
 
 #-----------------------only test with a few groups------------------------
