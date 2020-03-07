@@ -2,12 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 import pandas as pd
-import re
-import string
 
 # import and download NLP Resources
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
 import nltk
 nltk.download('stopwords')
@@ -135,38 +131,35 @@ bootstrap = [True, False]
 
 # Create the random grid
 grid_rfc = {'n_estimators': n_estimators,
-                  'max_features': max_features,
-                  'max_depth': max_depth,
-                  'min_samples_split': min_samples_split,
-                  'min_samples_leaf': min_samples_leaf,
-                  'bootstrap': bootstrap}
+            'max_features': max_features,
+            'max_depth': max_depth,
+            'min_samples_split': min_samples_split,
+            'min_samples_leaf': min_samples_leaf,
+            'bootstrap': bootstrap
+            }
 
 
 #----------------------------------ADABOOST------------------------------------
-# Define some base estimators for AdaBoost
 from sklearn.svm import LinearSVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
-
 
 svm = LinearSVC(random_state=0, tol=1e-5)
 lr = LogisticRegression(random_state=0, solver='lbfgs', multi_class='auto')
 mnb = MultinomialNB()
 
-base_estimator = [RFC, svm, lr, mnb, None]
-
-# Number of trees in random forest
-n_estimators = [int(x) for x in np.linspace(start = 50, stop = 400, num = 8)]
+# Define base estimators for AdaBoost
+base_estimator = [svm, lr, mnb, None]
 
 # Number of features to consider at every split
 algorithm = ['SAMME', 'SAMME.R']
 
-
 # Create the random grid
 grid_ada = {'base_estimator': base_estimator,
-                   'n_estimators': n_estimators,
-                   'algorithm': algorithm
-                   }
+            'n_estimators': n_estimators,
+            'algorithm': algorithm
+            }
+
 #%%
 # Perform random parameter search
 from sklearn.model_selection import RandomizedSearchCV
@@ -177,8 +170,11 @@ from sklearn.model_selection import RandomizedSearchCV
 ## Fit the random search model
 #rf_random.fit(X_train, train_labels)
 #
+#rf_random.predict(X_test)
+#accuracy_rfc = rf_random.score(X_test,test_labels)
 #print(rf_random.best_params_)
 #print(rf_random.best_score_)
+#print(accuracy_rfc)
 
 #------------------------------------ADABOOST----------------------------------
 #
@@ -187,9 +183,12 @@ from sklearn.model_selection import RandomizedSearchCV
 #
 ## Fit the random search model
 #rf_random.fit(X_train, train_labels)
+#rf_random.predict(X_test)
+#accuracy_ada = rf_random.score(X_test,test_labels)
 #
 #print(rf_random.best_params_)
 #print(rf_random.best_score_)
+#print(accuracy_ada)
 
 
 #%%
@@ -197,14 +196,14 @@ from sklearn.model_selection import RandomizedSearchCV
 from skopt import BayesSearchCV
 
 #--------------------------------RANDOM FORESET--------------------------------
-bayes_opt = BayesSearchCV(RFC, grid_rfc, n_iter=32, cv=3)
-
-bayes_opt.fit(X_train, train_labels)
-print(bayes_opt.best_params_)
-print(bayes_opt.best_score_)
+#bayes_opt = BayesSearchCV(RFC, grid_rfc, n_iter=32, cv=3)
+#
+#bayes_opt.fit(X_train, train_labels)
+#print(bayes_opt.best_params_)
+#print(bayes_opt.best_score_)
 
 #------------------------------------ADABOOST----------------------------------
-bayes_opt = BayesSearchCV(adaBoost, grid_rfc, n_iter=32, cv=3)
+bayes_opt = BayesSearchCV(adaBoost, grid_ada, n_iter=10, cv=3)
 
 bayes_opt.fit(X_train, train_labels)
 print(bayes_opt.best_params_)
