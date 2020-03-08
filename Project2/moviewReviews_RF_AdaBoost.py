@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 import pandas as pd
-import glob
 import os
 
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -26,18 +25,34 @@ test_dir_p = os.listdir(test_path_pos)
 train_dir_n = os.listdir(train_path_neg)
 train_dir_p = os.listdir(train_path_pos)
 
+test_path_ls = []
+train_path_ls = []
 for i in range(len(test_dir_n)):
     subpath_test_n = os.path.join(test_path_neg,test_dir_n[i])
-    subpath_test_s = os.path.join(test_path_pos,test_dir_p[i])
+    subpath_test_p = os.path.join(test_path_pos,test_dir_p[i])
     subpath_train_n = os.path.join(train_path_neg,train_dir_n[i])
     subpath_train_p = os.path.join(train_path_pos,train_dir_p[i])
     
-    all_txt_test = glob.glob(os.path.join(subpath_test_n, "*.txt"))
-    all_txt_train = glob.glob(os.path.join(subpath_train_n, "*.txt"))
+    test_path_ls.append(subpath_test_n)
+    test_path_ls.append(subpath_test_p)
+    train_path_ls.append(subpath_train_n)
+    train_path_ls.append(subpath_train_p)
+
+test_ls = []
+train_ls = []
+
+# read txt files and save as strings, put txt files in a string list
+for i in range(len(test_path_ls)):
+    with open(test_path_ls[i], 'r') as file:
+        temp_test = file.read().replace('\n', '')
+
+    with open(train_path_ls[i], 'r') as file:
+        temp_train = file.read().replace('\n', '')
+        
+    test_ls.append(temp_test)
+    train_ls.append(temp_train)
+
     
-for file in all_txt_test:
-    df = pd.read_excel(file)
-    list_dfs.append(df)
 
 
 
