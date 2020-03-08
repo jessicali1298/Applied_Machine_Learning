@@ -77,15 +77,14 @@ tfidf_transformer = TfidfTransformer()
 # in the dataset used
 X_train_counts = count_vect.fit_transform(twenty_train.data)
 X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
-print(X_train_counts.shape)
+print("train data counts: ", X_train_counts.shape)
 print(X_train_tfidf.shape)
-print(len(train_data))
 
 
 # for manual classification without pipeline (used for RandomSearchCV)
 
 X_all = tfidf_vect.fit_transform(all_data).toarray()
-print(X_all.shape) 
+print("all data counts: ", X_all.shape) 
 
 # Split data into training and testing
 X_train = X_all[0:len(train_data)]
