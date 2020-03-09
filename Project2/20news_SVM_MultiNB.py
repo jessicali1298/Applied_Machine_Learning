@@ -148,6 +148,7 @@ text_clf = Pipeline([('vect', tfidf_vect),
 text_clf.fit(train_data, train_labels)
 
 predicted = text_clf.predict(test_data)
+scores = cross_validate.cross_val_score(text_clf, cv=3)
 #accuracy = text_clf.score(test_data, test_labels)
 #print(accuracy)
 print("SVM: ", np.mean(predicted == test_labels))
@@ -161,4 +162,3 @@ predicted = text_clf_MNB.predict(test_data)
 #accuracy = text_clf.score(test_data, test_labels)
 #print(accuracy)
 print("Multinomial Naive Bayes: ", np.mean(predicted == test_labels))
-
