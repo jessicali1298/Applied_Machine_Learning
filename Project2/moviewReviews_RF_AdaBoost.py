@@ -69,12 +69,12 @@ def stemmed_words(doc):
     return (stemmer.stem(w) for w in analyzer(doc))
 
 # tfidf vectorizer with word stemmer
-tfidf_vect = TfidfVectorizer(analyzer=stemmed_words, stop_words='english')
+#tfidf_vect = TfidfVectorizer(analyzer=stemmed_words, stop_words='english')
 
 
 # Initialize the vectorizers and classifiers
 count_vect = CountVectorizer(analyzer='word', stop_words='english')
-#tfidf_vect = TfidfVectorizer(analyzer='word', stop_words='english')
+tfidf_vect = TfidfVectorizer(analyzer='word', stop_words='english')
 tfidf_transformer = TfidfTransformer()
 
 # Shuffle the data before preparing training and testing datasets
@@ -97,6 +97,7 @@ all_data = all_ls_shuffle[:,0]
 all_labels = all_ls_shuffle[:,1]
 
 # for manual classification without pipeline (used for RandomSearchCV)
+X_train_tfidf = tfidf_vect.fit_transform(train_data).toarray()
 
 X_all = tfidf_vect.fit_transform(all_data).toarray()
 print("all data counts: ", X_all.shape) 
@@ -105,26 +106,49 @@ print("all data counts: ", X_all.shape)
 X_train = X_all[0:len(train_ls)]
 X_test = X_all[len(train_ls):len(all_ls)]
 
-RFC = RandomForestClassifier(n_estimators=150)
-adaBoost = AdaBoostClassifier()
 
 
 #%%
+# Define base estimators for AdaBoost
+from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB
+
+svm = LinearSVC(random_state=0, tol=1e-5)
+lr = LogisticRegression(random_state=0, solver='lbfgs', multi_class='auto')
+mnb = MultinomialNB()
+
+#%%
+RFC = RandomForestClassifier(n_estimators=300, bootstrap=False)
+adaBoost = AdaBoostClassifier(base_estimator=svm, n_estimators=100, algorithm='SAMME')
+
+
+#%%
+## Manual checking
+#adaBoost.fit(X_train, train_labels)
+#predicted = adaBoost.predict(X_test)
+#accuracy = adaBoost.score(X_test, test_labels)
+#print(accuracy)
+#print(np.mean(predicted == test_labels))
+
+#%%
+# cross validation using training/validation set
+#cv_results = cross_validate(RFC, X_train_tfidf, train_labels, cv=5)
+#print("cv results: ", cv_results['test_score'], '\n', 
+#      "cv avg accuracy: ", np.mean(cv_results['test_score']))
+
 from sklearn.pipeline import Pipeline
+start_pip = time.time()
 text_clf = Pipeline([('vect', tfidf_vect),
                      ('clf', RFC)])
 text_clf.fit(train_data, train_labels)
 
 predicted = text_clf.predict(test_data)
+pip_duration = time.time() - start_pip
 accuracy = text_clf.score(test_data, test_labels)
 print(accuracy)
 print(np.mean(predicted == test_labels))
-
-#%%
-arr = np.array([[1,2,3],[1,2,3]])
-print(arr[:,1])
-
-
+print("computation time: ", pip_duration)
 
 
 
