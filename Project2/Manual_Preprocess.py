@@ -21,6 +21,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
+from skopt import BayesSearchCV
+
 
 #root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project2/'
 
