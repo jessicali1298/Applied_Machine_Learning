@@ -107,11 +107,6 @@ adaBoost_final = AdaBoostClassifier(base_estimator=svm, n_estimators=100,
 RFC = RandomForestClassifier()
 adaBoost = AdaBoostClassifier()
 
-# cross validation using training/validation set
-cv_results = cross_validate(adaBoost_final, X_train_tfidf, train_labels, cv=5)
-print("cv results: ", cv_results['test_score'], '\n', 
-      "cv avg accuracy: ", np.mean(cv_results['test_score']))
-
 
 #%%
 # Define parameters used for parameter opimization
@@ -223,6 +218,11 @@ from sklearn.model_selection import RandomizedSearchCV
 
 
 #%%
+# cross validation using training/validation set
+cv_results = cross_validate(adaBoost_final, X_train_tfidf, train_labels, cv=5)
+print("cv results: ", cv_results['test_score'], '\n', 
+      "cv avg accuracy: ", np.mean(cv_results['test_score']))
+
 from sklearn.pipeline import Pipeline
 start_pip = time.time()
 text_clf = Pipeline([('vect', tfidf_vect),
@@ -235,5 +235,35 @@ pip_duration = time.time() - start_pip
 #accuracy = text_clf.score(test_data, test_labels)
 #print(accuracy)
 print("testing accuracy: ", np.mean(predicted == test_labels))
-print("computation time: ", pip_duration)
+print("computation time RFC: ", pip_duration)
 
+
+
+start_pip2 = time.time()
+text_clf = Pipeline([('vect', tfidf_vect),
+                     ('clf', adaBoost_final)])
+text_clf.fit(train_data, train_labels)
+
+predicted2 = text_clf.predict(test_data)
+pip_duration2 = time.time() - start_pip2
+
+#accuracy = text_clf.score(test_data, test_labels)
+#print(accuracy)
+print("testing accuracy: ", np.mean(predicted2 == test_labels))
+print("computation time AdaBoost: ", pip_duration2)
+
+
+# calculate confustion matrix
+conf = confusion_matrix(test_labels, predicted)
+plt.figure()
+plt.imshow(conf)
+plt.title("Confusion Matrix - 20NewsGroup RandomForest"), plt.xticks([]), plt.yticks([])
+plt.show()
+
+conf2 = confusion_matrix(test_labels, predicted2)
+plt.figure()
+plt.imshow(conf2)
+plt.title("Confusion Matrix - 20NewsGroup AdaBoost"), plt.xticks([]), plt.yticks([])
+plt.show()
+
+    
