@@ -69,96 +69,178 @@ stemmer= PorterStemmer()
 def stemmed_words(doc):
     return (stemmer.stem(w) for w in analyzer(doc))
 
-tfidf_vect = TfidfVectorizer(analyzer='word', stop_words='english')
+tfidf_vect = TfidfVectorizer(analyzer=stemmed_words, stop_words='english')
 
 
 # Initialize the vectorizers and classifiers
 count_vect = CountVectorizer(analyzer='word', stop_words='english')
-tfidf_vect = TfidfVectorizer(analyzer='word', stop_words='english')
+#tfidf_vect = TfidfVectorizer(analyzer='word', stop_words='english')
 tfidf_transformer = TfidfTransformer()
 
 # for our own info, check how many documents and different words there are
 # in the dataset used
-X_train_counts = count_vect.fit_transform(twenty_train.data)
-X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
-print(X_train_counts.shape)
-print(X_train_tfidf.shape)
-print(len(train_data))
+#X_train_counts = count_vect.fit_transform(twenty_train.data)
+#X_train_tfidf = tfidf_transformer.fit_transform(X_train_counts)
+X_train_tfidf = tfidf_vect.fit_transform(train_data)
+print("train data counts: ", X_train_tfidf.shape)
 
 
-# for manual classification without pipeline
+# for manual classification without pipeline (used for RandomSearchCV)
 
 X_all = tfidf_vect.fit_transform(all_data).toarray()
-print(X_all.shape) #1963
+print("all data counts: ", X_all.shape) 
 
 # Split data into training and testing
 X_train = X_all[0:len(train_data)]
 X_test = X_all[len(train_data):len(X_all)]
 
 # Initialize the Classifier and start training
-clf = LinearSVC(random_state=0, tol=1e-5)
-MNB = MultinomialNB()
+
 #cv_results = cross_validate(clf, train_data, train_labels, cv=5)
 #print(cv_results['test_score'])
 
-#%%
 
-# Perform grid search to find best parameters
-#from sklearn.model_selection import RandomizedSearchCV
-#
-## Number of trees in random forest
-#n_estimators = [int(x) for x in np.linspace(start = 50, stop = 400, num = 8)]
-#
-## Number of features to consider at every split
-#max_features = ['auto', 'sqrt']
-#
-## Maximum number of levels in tree
-#max_depth = [int(x) for x in np.linspace(10, 110, num = 11)]
-#max_depth.append(None)
-#
-## Minimum number of samples required to split a node
-#min_samples_split = [2, 5, 10]
-#
-## Minimum number of samples required at each leaf node
-#min_samples_leaf = [1, 2, 4]
-#
-## Method of selecting samples for training each tree
-#bootstrap = [True, False]
+#%%
+# Initialize the Classifier and start training
+svm_final = LinearSVC(tol = 1e-5, random_state = 0, multi_class = 'ovr', max_iter = 4000)
+mnb_final = MultinomialNB(alpha = 1.0)
+clf = LinearSVC()
+MNB = MultinomialNB()
+#%%
+## Define parameters used for parameter opimization
+##
+###--------------------------------Linear SVM----------------------------------
+###tolerance for stopping criteria
+#tol = [1e-5, 2e-5, 5e-5, 1e-4]
+#multi_class = ['ovr', 'crammer_singer']
+##maximum iterations
+#max_iter = [int(x) for x in np.linspace(start = 1000, stop = 5000, num = 5)]
 #
 ## Create the random grid
-#random_grid = {'n_estimators': n_estimators,
-#               'max_features': max_features,
-#               'max_depth': max_depth,
-#               'min_samples_split': min_samples_split,
-#               'min_samples_leaf': min_samples_leaf,
-#               'bootstrap': bootstrap}
+#grid_svm = {'tol': tol,
+#            'multi_class': multi_class,
+#            'max_iter': max_iter
+#            }
 #
-#rf_random = RandomizedSearchCV(estimator = RFC, param_distributions = random_grid, n_iter = 50, cv = 3, verbose=2, random_state=42, n_jobs = -1)
+#
+##--------------------------Multinomial Naive Bayes----------------------------
+#
+## Smoothing parameter
+#alpha = [float(x) for x in np.linspace(start = 1.0, stop = 5.0, num = 10)]
+#
+#
+## Create the random grid
+#grid_mnb = {'alpha': alpha
+#            }
+##%%
+## Perform random parameter search
+#from sklearn.model_selection import RandomizedSearchCV
+#
+##--------------------------------Linear SVM------------------------------------
+#start_ran_svm = time.time()
+#svm_random = RandomizedSearchCV(estimator = clf, param_distributions = grid_svm, 
+#                               n_iter = 50, cv = 3, verbose=2, random_state=42, n_jobs = -1)
 ## Fit the random search model
-#rf_random.fit(X_train, train_labels)
+#svm_random.fit(X_train, train_labels)
 #
-#print(rf_random.best_params_)
-
+#svm_random.predict(X_test)
+#ran_svm_duration = time.time() - start_ran_svm
+#accuracy_svm = svm_random.score(X_test,test_labels)
+#print(svm_random.best_params_)
+#print(svm_random.best_score_)
+#print(accuracy_svm)
+#print("RandomSearch SVM duration: ", ran_svm_duration)
+#
+##--------------------------Multinomial Naive Bayes-----------------------------
+#start_ran_mnb = time.time()
+#mnb_random = RandomizedSearchCV(estimator = MNB, param_distributions = grid_mnb, 
+#                               n_iter = 50, cv = 3, verbose=2, random_state=42, n_jobs = -1)
+#
+## Fit the random search model
+#mnb_random.fit(X_train, train_labels)
+#mnb_random.predict(X_test)
+#ran_mnb_duration = time.time() - start_ran_mnb
+#accuracy_mnb = mnb_random.score(X_test,test_labels)
+#
+#print(mnb_random.best_params_)
+#print(mnb_random.best_score_)
+#print(accuracy_mnb)
+#print("RandomSearch Ada duration: ", ran_mnb_duration)
 
 #%%
+## Perform Bayesian Optimization for parameters
+#from skopt import BayesSearchCV
+#
+##--------------------------------Linear SVM------------------------------------
+#start_bayes_svm = time.time()
+#bayes_svm = BayesSearchCV(clf, grid_svm, n_iter=50, cv=3)
+#
+#bayes_svm.fit(X_train, train_labels)
+#bayes_svm.predict(X_test)
+#bayes_svm_duration = time.time() - start_bayes_svm
+#accuracy_bayes = bayes_svm.score(X_test, test_labels)
+#print(bayes_svm.best_params_)
+#print(bayes_svm.best_score_)
+#print(accuracy_bayes)
+#print("Bayes Op SVM duration: ",bayes_svm_duration)
+#
+##--------------------------Multinomial Naive Bayes-----------------------------
+#start_bayes_mnb = time.time()
+#bayes_mnb = BayesSearchCV(MNB, grid_mnb, n_iter=10, cv=3)
+#bayes_mnb.fit(X_train, train_labels)
+#bayes_mnb_duration = time.time() - start_bayes_mnb
+#print(bayes_mnb.best_params_)
+#print(bayes_mnb.best_score_)
+#print("Bayes Op Ada duration: ", bayes_mnb_duration)
+
+#%%
+# cross validation using training/validation set
+cv_results = cross_validate(svm_final, X_train_tfidf, train_labels, cv=5)
+print("SVM results: ", cv_results['test_score'], '\n', 
+      "SVM avg accuracy: ", np.mean(cv_results['test_score']))
+
 from sklearn.pipeline import Pipeline
+start_pip = time.time()
 text_clf = Pipeline([('vect', tfidf_vect),
-#                     ('tfidf', tfidf_transformer),
-                     ('clf', clf)])
+                     ('clf', svm_final)])
 text_clf.fit(train_data, train_labels)
 
 predicted = text_clf.predict(test_data)
-scores = cross_validate.cross_val_score(text_clf, cv=3)
+pip_duration = time.time() - start_pip
+
 #accuracy = text_clf.score(test_data, test_labels)
 #print(accuracy)
-print("SVM: ", np.mean(predicted == test_labels))
+print("SVM testing accuracy: ", np.mean(predicted == test_labels))
+print("computation time SVM: ", pip_duration)
 
-text_clf_MNB = Pipeline([('vect', tfidf_vect),
-#                     ('tfidf', tfidf_transformer),
-                     ('clf', MNB)])
-text_clf_MNB.fit(train_data, train_labels)
 
-predicted = text_clf_MNB.predict(test_data)
+cv_results = cross_validate(mnb_final, X_train_tfidf, train_labels, cv=5)
+print("MNB results: ", cv_results['test_score'], '\n', 
+      "MNB avg accuracy: ", np.mean(cv_results['test_score']))
+
+start_pip2 = time.time()
+text_clf = Pipeline([('vect', tfidf_vect),
+                     ('clf', mnb_final)])
+text_clf.fit(train_data, train_labels)
+
+predicted2 = text_clf.predict(test_data)
+pip_duration2 = time.time() - start_pip2
+
 #accuracy = text_clf.score(test_data, test_labels)
 #print(accuracy)
-print("Multinomial Naive Bayes: ", np.mean(predicted == test_labels))
+print("MNB testing accuracy: ", np.mean(predicted2 == test_labels))
+print("computation time MNB: ", pip_duration2)
+
+
+# calculate confustion matrix
+conf = confusion_matrix(test_labels, predicted)
+plt.figure()
+plt.imshow(conf)
+plt.title("Confusion Matrix - 20NewsGroup SVM"), plt.xticks([]), plt.yticks([])
+plt.show()
+
+conf2 = confusion_matrix(test_labels, predicted2)
+plt.figure()
+plt.imshow(conf2)
+plt.title("Confusion Matrix - 20NewsGroup Multinomial Naive Bayes"), plt.xticks([]), plt.yticks([])
+plt.show()
