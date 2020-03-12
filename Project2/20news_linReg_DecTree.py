@@ -27,6 +27,8 @@ from sklearn.model_selection import cross_validate
 from sklearn.model_selection import cross_val_score
 from sklearn.tree.export import export_text
 from sklearn.datasets import load_iris
+from sklearn import linear_model
+from sklearn.linear_model import LogisticRegressionCV
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
 
@@ -48,12 +50,12 @@ categories = ['alt.atheism','comp.graphics', 'misc.forsale','rec.autos', 'sci.me
 #categories = ['alt.atheism','comp.graphics', 'rec.autos', 'sci.med']
 #categories = ['comp.graphics', 'sci.med']
 #
-#twenty_train = fetch_20newsgroups(subset='train', categories=categories, 
-#                                  shuffle=True, random_state=42)
-#twenty_test = fetch_20newsgroups(subset='test', categories=categories, 
-#                                 shuffle=True, random_state=42)
-#twenty_all = fetch_20newsgroups(subset='all', categories=categories, 
-#                                 shuffle=True, random_state=42)
+twenty_train = fetch_20newsgroups(subset='train', categories=categories, 
+                                  shuffle=True, random_state=42)
+twenty_test = fetch_20newsgroups(subset='test', categories=categories, 
+                                 shuffle=True, random_state=42)
+twenty_all = fetch_20newsgroups(subset='all', categories=categories, 
+                                 shuffle=True, random_state=42)
 
 train_data = twenty_train.data
 train_labels = twenty_train.target
@@ -101,8 +103,9 @@ X_train = X_all[0:len(train_data)]
 X_test = X_all[len(train_data):len(X_all)]
 
 # Initialize the Classifier and start training
-clf = DecisionTreeClassifier(max_features=7,min_samples_leaf=1,max_depth=None,criterion='gini')
-LinearReg = LogisticRegression(random_state=0)
+clf = DecisionTreeClassifier(random_state=0)
+#LinearReg = LogisticRegressionCV(cv=5, random_state=0,solver='lbfgs', multi_class='auto')
+LinearReg = LogisticRegression(verbose=1, solver='liblinear',random_state=0, C=5, penalty='l2',max_iter=1000)#LogisticRegression(random_state=0,penalty='l2',solver='saga', multi_class='multinomial',max_iter=1000,)
 #acc = cross_val_score(clf, train_data, train_labels, cv=10, scoring='accuracy')
 #print(acc.mean())
 
@@ -148,33 +151,36 @@ LinearReg = LogisticRegression(random_state=0)
 #print(rf_random.best_params_)
 
 # Import necessary modules
-from scipy.stats import randint
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import RandomizedSearchCV
-
-# Setup the parameters and distributions to sample from: param_dist
-param_dist = {"max_depth": [int(x) for x in np.linspace(10, 110, num = 11)],
-              "max_features": randint(1, 12),
-              "min_samples_leaf": randint(1, 12),
-              "criterion": ["gini", "entropy"]}
-
-# Instantiate a Decision Tree classifier: tree
-tree = DecisionTreeClassifier()
-
-# Instantiate the RandomizedSearchCV object: tree_cv
-tree_cv = RandomizedSearchCV(tree, param_dist, cv=5)
-
-# Fit it to the data
-tree_cv.fit(X_train, train_labels)
-
-# Print the tuned parameters and score
-print("Tuned Decision Tree Parameters: {}".format(tree_cv.best_params_))
-print("Best score is {}".format(tree_cv.best_score_))
+#from scipy.stats import randint
+#from sklearn.tree import DecisionTreeClassifier
+#from sklearn.model_selection import RandomizedSearchCV
+#from sklearn.model_selection import GridSearchCV
+#
+#
+## Setup the parameters and distributions to sample from: param_dist
+#param_dist = {"max_depth": [int(x) for x in np.linspace(10, 110, num = 11)],
+#              "max_features": randint(1, 12),
+#              "min_samples_leaf": randint(1, 12),
+#              "criterion": ["gini", "entropy"]}
+#
+## Instantiate a Decision Tree classifier: tree
+#tree = DecisionTreeClassifier()
+#
+## Instantiate the RandomizedSearchCV object: tree_cv
+#tree_cv = GridSearchCV(tree, param_dist, cv=5)
+#
+## Fit it to the data
+#tree_cv.fit(X_train, train_labels)
+#
+## Print the tuned parameters and score
+#print("Tuned Decision Tree Parameters: {}".format(tree_cv.best_params_))
+#print("Best score is {}".format(tree_cv.best_score_))
 
 
 
 #%%
 from sklearn.pipeline import Pipeline
+start_pip = time.time()
 text_clf = Pipeline([('vect', tfidf_vect),
 #                     ('tfidf', tfidf_transformer),
                      ('clf', clf)])
@@ -182,17 +188,36 @@ text_clf.fit(train_data, train_labels)
 
 
 predicted = text_clf.predict(test_data)
+pip_duration = time.time() - start_pip
 #accuracy = text_clf.score(test_data, test_labels)
 #print(accuracy)
 print("decision tree: ", np.mean(predicted == test_labels))
+print("time", pip_duration)
+
+start_pip2 = time.time()
 
 text_clf_LinearReg = Pipeline([('vect', tfidf_vect),
 #                     ('tfidf', tfidf_transformer),
                      ('clf', LinearReg)])
 text_clf_LinearReg.fit(train_data, train_labels)
 
-predicted = text_clf_LinearReg.predict(test_data)
+predicted2 = text_clf_LinearReg.predict(test_data)
+pip_duration2 = time.time() - start_pip2
 #accuracy = text_clf.score(test_data, test_labels)
 #print(accuracy)
-print("LinearReg: ", np.mean(predicted == test_labels))
+print("LinearReg: ", np.mean(predicted2 == test_labels))
+print("time", pip_duration2)
+
+# calculate confustion matrix
+#conf = confusion_matrix(test_labels, predicted2)
+#plt.figure()
+#plt.imshow(conf)
+#plt.title("Confusion Matrix - 20NewsGroup linear reg"), plt.xticks([]), plt.yticks([])
+#plt.show()
+#
+#conf2 = confusion_matrix(test_labels, predicted)
+#plt.figure()
+#plt.imshow(conf2)
+#plt.title("Confusion Matrix - 20NewsGroup decison tree"), plt.xticks([]), plt.yticks([])
+#plt.show()
 
