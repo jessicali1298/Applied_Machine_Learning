@@ -151,32 +151,32 @@ LinearReg = LogisticRegression(verbose=1, solver='liblinear',random_state=0, C=5
 #print(rf_random.best_params_)
 
 # Import necessary modules
-from scipy.stats import randint
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import RandomizedSearchCV
-from sklearn.model_selection import GridSearchCV
-
-start_pip = time.time()
-# Setup the parameters and distributions to sample from: param_dist
-param_dist = {"max_depth": [3,None],
-              "max_features": randint(1, 9),
-              "min_samples_leaf": randint(1, 9),
-              "criterion": ["gini", "entropy"]}
-
-# Instantiate a Decision Tree classifier: tree
-tree = DecisionTreeClassifier()
-
-# Instantiate the RandomizedSearchCV object: tree_cv
-tree_cv = RandomizedSearchCV(tree, param_dist, cv=3)
-
-# Fit it to the data
-tree_cv.fit(X_train, train_labels)
-
-# Print the tuned parameters and score
-print("Tuned Decision Tree Parameters: {}".format(tree_cv.best_params_))
-print("Best score is {}".format(tree_cv.best_score_))
-pip_duration = time.time() - start_pip
-print(pip_duration)
+#from scipy.stats import randint
+#from sklearn.tree import DecisionTreeClassifier
+#from sklearn.model_selection import RandomizedSearchCV
+#from sklearn.model_selection import GridSearchCV
+#
+#start_pip = time.time()
+## Setup the parameters and distributions to sample from: param_dist
+#param_dist = {"max_depth": [3,None],
+#              "max_features": randint(1, 9),
+#              "min_samples_leaf": randint(1, 9),
+#              "criterion": ["gini", "entropy"]}
+#
+## Instantiate a Decision Tree classifier: tree
+#tree = DecisionTreeClassifier()
+#
+## Instantiate the RandomizedSearchCV object: tree_cv
+#tree_cv = RandomizedSearchCV(tree, param_dist, cv=3)
+#
+## Fit it to the data
+#tree_cv.fit(X_train, train_labels)
+#
+## Print the tuned parameters and score
+#print("Tuned Decision Tree Parameters: {}".format(tree_cv.best_params_))
+#print("Best score is {}".format(tree_cv.best_score_))
+#pip_duration = time.time() - start_pip
+#print(pip_duration)
 
 
 
