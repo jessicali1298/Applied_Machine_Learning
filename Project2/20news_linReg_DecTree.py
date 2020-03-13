@@ -50,12 +50,12 @@ categories = ['alt.atheism','comp.graphics', 'misc.forsale','rec.autos', 'sci.me
 #categories = ['alt.atheism','comp.graphics', 'rec.autos', 'sci.med']
 #categories = ['comp.graphics', 'sci.med']
 #
-twenty_train = fetch_20newsgroups(subset='train', categories=categories, 
-                                  shuffle=True, random_state=42)
-twenty_test = fetch_20newsgroups(subset='test', categories=categories, 
-                                 shuffle=True, random_state=42)
-twenty_all = fetch_20newsgroups(subset='all', categories=categories, 
-                                 shuffle=True, random_state=42)
+#twenty_train = fetch_20newsgroups(subset='train', categories=categories, 
+#                                  shuffle=True, random_state=42)
+#twenty_test = fetch_20newsgroups(subset='test', categories=categories, 
+#                                 shuffle=True, random_state=42)
+#twenty_all = fetch_20newsgroups(subset='all', categories=categories, 
+#                                 shuffle=True, random_state=42)
 
 train_data = twenty_train.data
 train_labels = twenty_train.target
@@ -151,30 +151,32 @@ LinearReg = LogisticRegression(verbose=1, solver='liblinear',random_state=0, C=5
 #print(rf_random.best_params_)
 
 # Import necessary modules
-#from scipy.stats import randint
-#from sklearn.tree import DecisionTreeClassifier
-#from sklearn.model_selection import RandomizedSearchCV
-#from sklearn.model_selection import GridSearchCV
-#
-#
-## Setup the parameters and distributions to sample from: param_dist
-#param_dist = {"max_depth": [int(x) for x in np.linspace(10, 110, num = 11)],
-#              "max_features": randint(1, 12),
-#              "min_samples_leaf": randint(1, 12),
-#              "criterion": ["gini", "entropy"]}
-#
-## Instantiate a Decision Tree classifier: tree
-#tree = DecisionTreeClassifier()
-#
-## Instantiate the RandomizedSearchCV object: tree_cv
-#tree_cv = GridSearchCV(tree, param_dist, cv=5)
-#
-## Fit it to the data
-#tree_cv.fit(X_train, train_labels)
-#
-## Print the tuned parameters and score
-#print("Tuned Decision Tree Parameters: {}".format(tree_cv.best_params_))
-#print("Best score is {}".format(tree_cv.best_score_))
+from scipy.stats import randint
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import GridSearchCV
+
+start_pip = time.time()
+# Setup the parameters and distributions to sample from: param_dist
+param_dist = {"max_depth": [3,None],
+              "max_features": randint(1, 9),
+              "min_samples_leaf": randint(1, 9),
+              "criterion": ["gini", "entropy"]}
+
+# Instantiate a Decision Tree classifier: tree
+tree = DecisionTreeClassifier()
+
+# Instantiate the RandomizedSearchCV object: tree_cv
+tree_cv = RandomizedSearchCV(tree, param_dist, cv=3)
+
+# Fit it to the data
+tree_cv.fit(X_train, train_labels)
+
+# Print the tuned parameters and score
+print("Tuned Decision Tree Parameters: {}".format(tree_cv.best_params_))
+print("Best score is {}".format(tree_cv.best_score_))
+pip_duration = time.time() - start_pip
+print(pip_duration)
 
 
 
@@ -187,11 +189,11 @@ text_clf = Pipeline([('vect', tfidf_vect),
 text_clf.fit(train_data, train_labels)
 
 
-predicted = text_clf.predict(test_data)
+predicted = text_clf.predict(train_data)
 pip_duration = time.time() - start_pip
 #accuracy = text_clf.score(test_data, test_labels)
 #print(accuracy)
-print("decision tree: ", np.mean(predicted == test_labels))
+print("decision tree: ", np.mean(predicted == train_labels))
 print("time", pip_duration)
 
 start_pip2 = time.time()
@@ -208,16 +210,16 @@ pip_duration2 = time.time() - start_pip2
 print("LinearReg: ", np.mean(predicted2 == test_labels))
 print("time", pip_duration2)
 
-# calculate confustion matrix
-#conf = confusion_matrix(test_labels, predicted2)
-#plt.figure()
-#plt.imshow(conf)
-#plt.title("Confusion Matrix - 20NewsGroup linear reg"), plt.xticks([]), plt.yticks([])
-#plt.show()
-#
-#conf2 = confusion_matrix(test_labels, predicted)
-#plt.figure()
-#plt.imshow(conf2)
-#plt.title("Confusion Matrix - 20NewsGroup decison tree"), plt.xticks([]), plt.yticks([])
-#plt.show()
+#calculate confustion matrix
+conf = confusion_matrix(test_labels, predicted2)
+plt.figure()
+plt.imshow(conf)
+plt.title("Confusion Matrix - 20NewsGroup logistic reg"), plt.xticks([]), plt.yticks([])
+plt.show()
+
+conf2 = confusion_matrix(test_labels, predicted)
+plt.figure()
+plt.imshow(conf2)
+plt.title("Confusion Matrix - 20NewsGroup decison tree"), plt.xticks([]), plt.yticks([])
+plt.show()
 
