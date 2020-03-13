@@ -69,12 +69,12 @@ stemmer= PorterStemmer()
 def stemmed_words(doc):
     return (stemmer.stem(w) for w in analyzer(doc))
 
-tfidf_vect = TfidfVectorizer(analyzer=stemmed_words, stop_words='english')
+#tfidf_vect = TfidfVectorizer(analyzer=stemmed_words, stop_words='english')
 
 
 # Initialize the vectorizers and classifiers
 count_vect = CountVectorizer(analyzer='word', stop_words='english')
-#tfidf_vect = TfidfVectorizer(analyzer='word', stop_words='english')
+tfidf_vect = TfidfVectorizer(analyzer='word', stop_words='english', max_features = 100000)
 tfidf_transformer = TfidfTransformer()
 
 # for our own info, check how many documents and different words there are
@@ -102,8 +102,9 @@ X_test = X_all[len(train_data):len(X_all)]
 
 #%%
 # Initialize the Classifier and start training
-svm_final = LinearSVC(tol = 1e-5, random_state = 0, multi_class = 'ovr', max_iter = 4000)
-mnb_final = MultinomialNB(alpha = 1.0)
+svm_final = LinearSVC(tol = 1e-5, random_state = 0, multi_class = 'ovr', 
+                      max_iter = 4000, class_weight = 'balanced')
+mnb_final = MultinomialNB(alpha = 0.01)
 clf = LinearSVC()
 MNB = MultinomialNB()
 #%%
@@ -126,7 +127,7 @@ MNB = MultinomialNB()
 ##--------------------------Multinomial Naive Bayes----------------------------
 #
 ## Smoothing parameter
-#alpha = [float(x) for x in np.linspace(start = 1.0, stop = 5.0, num = 10)]
+#alpha = [0.01, 0.1, 1, 2, 5]
 #
 #
 ## Create the random grid
@@ -195,11 +196,11 @@ MNB = MultinomialNB()
 
 #%%
 # cross validation using training/validation set
+
+from sklearn.pipeline import Pipeline
 cv_results = cross_validate(svm_final, X_train_tfidf, train_labels, cv=5)
 print("SVM results: ", cv_results['test_score'], '\n', 
       "SVM avg accuracy: ", np.mean(cv_results['test_score']))
-
-from sklearn.pipeline import Pipeline
 start_pip = time.time()
 text_clf = Pipeline([('vect', tfidf_vect),
                      ('clf', svm_final)])
@@ -208,8 +209,8 @@ text_clf.fit(train_data, train_labels)
 predicted = text_clf.predict(test_data)
 pip_duration = time.time() - start_pip
 
-#accuracy = text_clf.score(test_data, test_labels)
-#print(accuracy)
+accuracy = text_clf.score(test_data, test_labels)
+print(accuracy)
 print("SVM testing accuracy: ", np.mean(predicted == test_labels))
 print("computation time SVM: ", pip_duration)
 
@@ -242,5 +243,5 @@ plt.show()
 conf2 = confusion_matrix(test_labels, predicted2)
 plt.figure()
 plt.imshow(conf2)
-plt.title("Confusion Matrix - 20NewsGroup Multinomial Naive Bayes"), plt.xticks([]), plt.yticks([])
+plt.title("Confusion Matrix - 20NewsGroup Multinomial NB"), plt.xticks([]), plt.yticks([])
 plt.show()

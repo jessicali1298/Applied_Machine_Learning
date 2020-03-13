@@ -13,6 +13,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.svm import LinearSVC
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import BernoulliNB
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import AdaBoostClassifier
@@ -112,37 +113,21 @@ X_test = X_all[len(train_ls):len(all_ls)]
 
 #%%
 # Initialize the Classifier and start training
-svm_final = LinearSVC(tol = 1e-5, random_state = 0, multi_class = 'ovr', max_iter = 4000)
-mnb_final = MultinomialNB(alpha = 1.0)
+svm_final = LinearSVC(tol = 1e-5, random_state = 0, multi_class = 'ovr', 
+                      max_iter = 4000,  class_weight = 'balanced')
+mnb_final = MultinomialNB(alpha = 0.01)
 clf = LinearSVC()
 MNB = MultinomialNB()
+BNB = BernoulliNB()
 
 
-#%%
-## cross validation using training/validation set
-#cv_results = cross_validate(adaBoost, X_train_tfidf, train_labels, cv=5)
-#print("cv results: ", cv_results['test_score'], '\n', 
-#      "cv avg accuracy: ", np.mean(cv_results['test_score']))
-#
-#from sklearn.pipeline import Pipeline
-#start_pip = time.time()
-#text_clf = Pipeline([('vect', tfidf_vect),
-#                     ('clf', adaBoost)])
-#text_clf.fit(train_data, train_labels)
-#
-#predicted = text_clf.predict(test_data)
-#pip_duration = time.time() - start_pip
-#accuracy = text_clf.score(test_data, test_labels)
-#print(accuracy)
-#print(np.mean(predicted == test_labels))
-#print("computation time: ", pip_duration)
 
 #%%
 # cross validation using training/validation set
 cv_results = cross_validate(svm_final, X_train_tfidf, train_labels, cv=5)
 print("SVM results: ", cv_results['test_score'], '\n', 
       "SVM avg accuracy: ", np.mean(cv_results['test_score']))
-
+#
 from sklearn.pipeline import Pipeline
 start_pip = time.time()
 text_clf = Pipeline([('vect', tfidf_vect),
@@ -176,19 +161,18 @@ print("MNB testing accuracy: ", np.mean(predicted2 == test_labels))
 print("computation time MNB: ", pip_duration2)
 
 
-# calculate confustion matrix
+## calculate confustion matrix
 conf = confusion_matrix(test_labels, predicted)
 plt.figure()
 plt.imshow(conf)
 plt.title("Confusion Matrix - Movie Review SVM"), plt.xticks([]), plt.yticks([])
 plt.show()
-
+#
 conf2 = confusion_matrix(test_labels, predicted2)
 plt.figure()
 plt.imshow(conf2)
-plt.title("Confusion Matrix - Movie Review Multinomial Naive Bayes"), plt.xticks([]), plt.yticks([])
+plt.title("Confusion Matrix - Movie Review Multinomial NB"), plt.xticks([]), plt.yticks([])
 plt.show()
-
 
 
 
