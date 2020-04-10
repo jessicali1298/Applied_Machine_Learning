@@ -5,7 +5,13 @@
 #and increase the number of layers, and play with the number of units per layer
 
 
-# type of activation function; number of layers, number of units/layer
+
+# Questions:
+#1. structure of MLP (numerous hidden layers + 1 activation layer?)
+#2. 2-layer MLP is 2 hidden layers?
+#3. Softmax likelihood
+
+# VARIABLES: type of activation function; number of layers, number of units/layer
 
 import numpy as np
 def logsumexp(Z, # Z x K
@@ -37,7 +43,7 @@ def gradients(X, #N x D
               W, #M x K 
               V, #D x M
               ):
-    z = logistic(np.dot(X,V)) #N x M
+    Z = logistic(np.dot(X,V)) #N x M
     N,D = X.shape
     Yh = softmax(np.dot(Z,W)) #N x K
     dY = Yh - Y #N x K
