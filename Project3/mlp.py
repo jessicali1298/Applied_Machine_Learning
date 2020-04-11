@@ -20,20 +20,22 @@ class MLP:
         return np.max(z,0)
     
     def logistic(self, z):
-            pos_num = np.where(z>=0)[0]
-            neg_num = np.where(z<0)[0]
-            
-            ans = np.empty(z.shape)
-            
-            ans[pos_num] = 1/(1+np.exp(-z[pos_num]))
-            ans[neg_num] = np.exp(z[neg_num])/(1+np.exp(z[neg_num]))
+        # Z = N xM
+        print('input of sigmoid: ', z.shape)
+        pos_num = np.where(z>=0)
+        neg_num = np.where(z<0)
         
-            return ans
+        ans = np.empty(z.shape)
+        
+        ans[pos_num[0], pos_num[1]] = 1/(1+np.exp(-z[pos_num[0], pos_num[1]]))
+        ans[neg_num[0], neg_num[1]] = np.exp(z[neg_num[0], neg_num[1]])/(1+np.exp(z[neg_num[0], neg_num[1]]))
+    
+        return ans
     
     def logsumexp(self,
                   Z # Z x K
                   ):
-        Zmax = np.max(Z, axis=1)[:,None]
+        Zmax = np.max(Z, axis=1)[:,None] # find Max by row & convert into Nx1 vecotr
         lse = Zmax + np.log(np.sum(np.exp(Z - Zmax),axis=1))[:,None]
         return lse #N
     
@@ -56,6 +58,7 @@ class MLP:
         nll = -np.mean(np.sum(U*Y, 1) - self.logsumexp(U))
         return nll
     
+    # assume middle layer activation function is logistic sigmoid
     def gradients(self,
                   X, #N x D
                   Y, #N x K
