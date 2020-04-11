@@ -12,7 +12,19 @@ class LogisticRegression:
 # 2. Compute predicted probability (sigmoid function)
 # 3 prob > 0.5, y = 1;   prob < 0.5, y = 0;   prob = 0.5, use random decider
 
-    #------------------PSEUDO-CODE-------------------
+    def logistic(self,input1, input2):
+        z = np.dot(input1, input2)
+        
+        pos_num = np.where(z>=0)[0]
+        neg_num = np.where(z<0)[0]
+        
+        ans = np.empty(z.shape[0])
+        
+        ans[pos_num] = 1/(1+np.exp(-z[pos_num]))
+        ans[neg_num] = np.exp(z[neg_num])/(1+np.exp(z[neg_num]))
+    
+        return ans
+    
     def gradient(self,X,y,w):
         N,m = X.shape
     #    th = 1/(1+np.exp(-np.dot(w.T, X)))
@@ -22,9 +34,8 @@ class LogisticRegression:
         grad = (1/N) * np.dot(X.T, th-y)
         return grad
     
+    
     # using epsilon as stopping criteria
-
-
     def gradientDescent(self, X, y, a, end_cond, lamda):
 
         N,m = X.shape
@@ -39,7 +50,6 @@ class LogisticRegression:
         return w
     
     # using num. of iterations as stopping criteria
-
     def gradientDescent_iter(self, X, y, a, num_iter, lamda):
 
         N,m = X.shape
@@ -55,31 +65,17 @@ class LogisticRegression:
             i = i+1
         return w
     
-    def logistic(self,input1, input2):
-        z = np.dot(input1, input2)
-        
-        pos_num = np.where(z>=0)[0]
-        neg_num = np.where(z<0)[0]
-        
-        ans = np.empty(z.shape[0])
-        
-        ans[pos_num] = 1/(1+np.exp(-z[pos_num]))
-        ans[neg_num] = np.exp(z[neg_num])/(1+np.exp(z[neg_num]))
 
-        return ans
-
-
+    # fit using epsilon as stopping criteria for GD
     def fit(self, X, y, a, end_cond, lamda):
-
         # N = number of instances, m = number of features
         N,m = X.shape
         
         w = self.gradientDescent(X, y, a, end_cond, lamda)
         self.weight = w
     
+    
     # fit using number of iterations as stopping criteria for gradient descent
-
-
     def fit_iter(self, X, y, a, num_iter, lamda):
         N,m = X.shape
         
@@ -92,17 +88,17 @@ class LogisticRegression:
         w = self.weight
         prob = self.logistic(X, w.T)
         
-        class_1_idx = np.where(prob > 0.5)[0]
-        class_0_idx = np.where(prob < 0.5)[0]
-        equal_prob_idx = np.where(prob == 0.5)[0]
-        
-        pred_arr = np.empty(N)
-        
-        pred_arr[class_1_idx] = 1
-        pred_arr[class_0_idx] = 0
-        pred_arr[equal_prob_idx] = np.random.choice(2,1)
+#        class_1_idx = np.where(prob > 0.5)[0]
+#        class_0_idx = np.where(prob < 0.5)[0]
+#        equal_prob_idx = np.where(prob == 0.5)[0]
+#        
+#        pred_arr = np.empty(N)
+#        
+#        pred_arr[class_1_idx] = 1
+#        pred_arr[class_0_idx] = 0
+#        pred_arr[equal_prob_idx] = np.random.choice(2,1)
             
-        return pred_arr
+        return prob
         
 
     def evaluate(self, y_truth, y_pred):
