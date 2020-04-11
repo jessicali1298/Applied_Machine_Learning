@@ -11,6 +11,7 @@ def unpickle(file):
     return dict
 
 root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
+
 data_dir = sorted(os.listdir(root_path))
 dict_ls = []
 
