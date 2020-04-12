@@ -26,9 +26,11 @@ W,V = mlp_nn.GD(np.asarray(dict_ls[0][b'data']), np.asarray(dict_ls[0][b'labels'
                 10, 0.1, 1e-9, 100000)
 #GD(self, X, Y, M, lr=0.1, eps=1e-9, max_iters=100000):
 
-temp = np.asarray(dict_ls[0][b'labels'])[:,None]
-
+#temp = np.asarray(dict_ls[0][b'labels'])[:,None]
+#
 #temp1 = np.array([[1,3,1],[1,4,2]])
+#temp1[temp1>1] = 999
+#print(temp1)
 #temp = np.empty(temp1.shape)
 #idx1 = np.where(temp1==1)
 #print(idx1)

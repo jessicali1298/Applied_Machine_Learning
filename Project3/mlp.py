@@ -17,8 +17,14 @@ import numpy as np
 class MLP:
     
     def ReLu(self, z):
-        return np.max(z,0)
+        zeroes = np.zeros(z.shape)
+        return np.maximum(z,zeroes)
     
+    def ReLuGrad(self, z):
+        z[z<=0] = 0
+        z[z>0] = 1
+        return z
+        
     def logistic(self, z):
         # Z = N xM
         pos_num = np.where(z>=0)
@@ -42,16 +48,19 @@ class MLP:
                 u # N x K
                 ):
         u_exp = np.exp(u - np.max(u,1)[:, None])
-        return u_exp / np.sum(u_exp, axis=-1)[:, None]
+        print('softmax - u_exp: ', u_exp.shape)
+        result = u_exp / np.sum(u_exp, axis=-1)[:, None]
+        print('result: ', result.shape)
+        return result
     
     def cost(self,
              X, #N x D
              Y, #N x K
              W, #M x K
-             V #N x M
+             V  #N x M
              ):
         Q = np.dot(X,V)
-        Z = self.logistic(Q)
+        Z = self.ReLu(Q)
         U = np.dot(Z, W)
     #    Yh = softmax(U)
         nll = -np.mean(np.sum(U*Y, 1) - self.logsumexp(U))
@@ -69,8 +78,8 @@ class MLP:
         print('W: ', W.shape)
         print('V: ', V.shape)
         
-        Z = self.logistic(np.dot(X,V)) #N x M     10000 x 10
-        print('input of sigmoid: ', Z.shape)
+        Z = self.ReLu(np.dot(X,V)) #N x M     10000 x 10, hidden layer
+        print('input of ReLu: ', Z.shape)
         
         N,D = X.shape
         Yh = self.softmax(np.dot(Z,W)) #N x K     10000 x 1
@@ -85,7 +94,8 @@ class MLP:
         dZ = np.dot(dY, W.T)    #N x M
         print('dZ: ', dZ.shape)
         
-        dV = np.dot(X.T, dZ * Z * (1-Z))/N #D x M
+#        dV = np.dot(X.T, dZ * Z * (1-Z))/N #D x M
+        dV = np.dot(X.T, dZ * self.ReLuGrad(Z))/N
         print('dV: ', dV.shape)
         return dW, dV
     
