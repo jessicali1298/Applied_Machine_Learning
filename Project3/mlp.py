@@ -21,7 +21,6 @@ class MLP:
     
     def logistic(self, z):
         # Z = N xM
-        print('input of sigmoid: ', z.shape)
         pos_num = np.where(z>=0)
         neg_num = np.where(z<0)
         
@@ -65,20 +64,35 @@ class MLP:
                   W, #M x K 
                   V #D x M
                   ):
-        Z = self.logistic(np.dot(X,V)) #N x M
+        print('X: ', X.shape)
+        print('Y: ', Y.shape)
+        print('W: ', W.shape)
+        print('V: ', V.shape)
+        
+        Z = self.logistic(np.dot(X,V)) #N x M     10000 x 10
+        print('input of sigmoid: ', Z.shape)
+        
         N,D = X.shape
-        Yh = self.softmax(np.dot(Z,W)) #N x K
-        dY = Yh - Y #N x K
-        dW = np.dot(Z.T, dY)/N #M x K
-        dZ = np.dot(dY, W.T) #N x M
+        Yh = self.softmax(np.dot(Z,W)) #N x K     10000 x 1
+        print('Yh: ', Yh.shape)
+        
+        dY = Yh - Y     #N x K     10000 x 10000
+        print('dY: ', dY.shape)
+        
+        dW = np.dot(Z.T, dY)/N  #M x K     10 x 10000
+        print('dW: ', dW.shape)
+        
+        dZ = np.dot(dY, W.T)    #N x M
+        print('dZ: ', dZ.shape)
+        
         dV = np.dot(X.T, dZ * Z * (1-Z))/N #D x M
+        print('dV: ', dV.shape)
         return dW, dV
     
     
     def GD(self, X, Y, M, lr, eps, max_iters):
         N,D = X.shape
-        N = Y.shape
-        K = 1
+        N,K = Y.shape
         W = np.random.randn(M, K) * 0.01
         V = np.random.randn(D, M) * 0.01
         dW = np.inf * np.ones_like(W)

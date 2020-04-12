@@ -22,9 +22,11 @@ for i in range(len(data_dir)):
 
 #print(dict_ls[0].keys())
 
-W,V = mlp_nn.GD(np.asarray(dict_ls[0][b'data']), np.asarray(dict_ls[0][b'labels']), 
+W,V = mlp_nn.GD(np.asarray(dict_ls[0][b'data']), np.asarray(dict_ls[0][b'labels'][:,None]), 
                 10, 0.1, 1e-9, 100000)
-GD(self, X, Y, M, lr=0.1, eps=1e-9, max_iters=100000):
+#GD(self, X, Y, M, lr=0.1, eps=1e-9, max_iters=100000):
+
+temp = np.asarray(dict_ls[0][b'labels'])[:,None]
 
 #temp1 = np.array([[1,3,1],[1,4,2]])
 #temp = np.empty(temp1.shape)
