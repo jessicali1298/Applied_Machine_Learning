@@ -20,15 +20,23 @@ for i in range(len(data_dir)):
     final_path = os.path.join(root_path, data_dir[i])
     dict_ls.append(unpickle(final_path))
 
-#print(dict_ls[0].keys())
 
+# fit(self, X, Y, M, lr, eps, max_iters, batch_size)
 W,V = mlp_nn.GD(np.asarray(dict_ls[0][b'data']), np.asarray(dict_ls[0][b'labels'][:,None]), 
                 10, 0.1, 1e-9, 100000)
-#GD(self, X, Y, M, lr=0.1, eps=1e-9, max_iters=100000):
+#GD(self, X, Y, M, lr=0.1, eps=1e-9, max_iters=100000)
+
+
+
+
 
 #temp = np.asarray(dict_ls[0][b'labels'])[:,None]
 #
-#temp1 = np.array([[1,3,1],[1,4,2]])
+temp1 = np.array([[1,1],[1,0],[1,0],[4,1],[2,1]])
+temp1 = temp1[:1]
+ls = []
+temp3 = int(np.floor(1000/30))
+
 #temp1[temp1>1] = 999
 #print(temp1)
 #temp = np.empty(temp1.shape)
@@ -36,3 +44,4 @@ W,V = mlp_nn.GD(np.asarray(dict_ls[0][b'data']), np.asarray(dict_ls[0][b'labels'
 #print(idx1)
 #print(temp1[idx1[0], idx1[1]])
 #print(np.max(temp1, axis=-1)[:,None])
+
