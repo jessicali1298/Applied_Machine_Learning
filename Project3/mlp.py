@@ -43,7 +43,7 @@ class MLP:
     
     def one_hot(self, Y):
         N, C = Y.shape[0], (np.max(Y)+1)
-        y_hot = np.zeros(N, C)
+        y_hot = np.zeros([N, C])
         y_hot[np.arange(N),Y.flatten()] = 1
         return y_hot
     

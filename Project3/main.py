@@ -8,8 +8,8 @@ def unpickle(file):
         dict = pickle.load(fo, encoding='bytes')
     return dict
 
-root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
-# root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
+#root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
+root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
 data_dir = sorted(os.listdir(root_path))
 dict_ls = []
 
@@ -40,16 +40,6 @@ mlp_nn.fit(X, Y, M, lr, eps, max_iters, batch_size)
 
 Wh = mlp_nn.W
 Vh = mlp_nn.V
-
-
-
-
-#%%
-#temp = np.array([[1],[4],[0],[3],[2],[0]])
-#
-#y_hot = mlp_nn.one_hot(temp)
-#print(temp.shape[0], np.max(temp)+1)
-
 #%% check gradients
 
 #def func(x):
