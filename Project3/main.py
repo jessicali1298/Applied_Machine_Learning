@@ -41,6 +41,15 @@ mlp_nn.fit(X, Y, M, lr, eps, max_iters, batch_size)
 Wh = mlp_nn.W
 Vh = mlp_nn.V
 
+
+
+
+#%%
+#temp = np.array([[1],[4],[0],[3],[2],[0]])
+#
+#y_hot = mlp_nn.one_hot(temp)
+#print(temp.shape[0], np.max(temp)+1)
+
 #%% check gradients
 
 #def func(x):
@@ -58,8 +67,8 @@ Vh = mlp_nn.V
 #%%
 #temp = np.asarray(dict_ls[0][b'labels'])[:,None]
 #
-#temp1 = np.array([[1,1],[1,0],[1,0],[4,1],[2,1]])
-#temp1 = temp1[:1]
+temp1 = np.array([[1,1],[1,0],[1,0],[4,1],[2,1]])
+temp2 = temp1[[0,1,2],[0,1]]
 #ls = []
 #temp3 = int(np.floor(1000/30))
 

@@ -23,7 +23,7 @@ class MLP:
         return z
         
     def logistic(self, z):
-        # Z = N xM
+        # Z = N x M
         pos_num = np.where(z>=0)
         neg_num = np.where(z<0)
         
@@ -41,6 +41,13 @@ class MLP:
         lse = Zmax + np.log(np.sum(np.exp(Z - Zmax),axis=1))[:,None]
         return lse #N
     
+    def one_hot(self, Y):
+        N, C = Y.shape[0], (np.max(Y)+1)
+        y_hot = np.zeros(N, C)
+        y_hot[np.arange(N),Y.flatten()] = 1
+        return y_hot
+    
+    
     def softmax(self,
                 u # N x K
                 ):
@@ -55,7 +62,7 @@ class MLP:
              X, #N x D
              Y, #N x K
              W, #M x K
-             V  #N x M
+             V  #D x M
              ):
         Q = np.dot(X,V)
         Z = self.ReLu(Q)
@@ -92,7 +99,7 @@ class MLP:
                   X, #N x D
                   Y, #N x K
                   W, #M x K 
-                  V #D x M
+                  V  #D x M
                   ):
         print('X: ', X.shape)
         print('Y: ', Y.shape)
@@ -109,7 +116,7 @@ class MLP:
         dY = Yh - Y     #N x K     10000 x 1
         print('dY: ', dY)
         
-        dW = np.dot(Z.T, dY)/N  #M x K     10 x 10000 
+        dW = np.dot(Z.T, dY)/N  #M x K     10 x 10 
         print('dW: ', dW)
         
         dZ = np.dot(dY, W.T)    #N x M
