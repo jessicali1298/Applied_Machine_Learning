@@ -44,10 +44,11 @@ class MLP:
     def softmax(self,
                 u # N x K
                 ):
+        print('softmax input: ', u)
         u_exp = np.exp(u - np.max(u,1)[:, None])
-        print('softmax - u_exp: ', u_exp.shape)
+        print('softmax - u_exp: ', u_exp)
         result = u_exp / np.sum(u_exp, axis=-1)[:, None]
-        print('result: ', result.shape)
+        print('result: ', result)
         return result
     
     def cost(self,
@@ -77,11 +78,12 @@ class MLP:
             mini_Y = mini_batch[:, -1]
             batch_ls.append((mini_X, mini_Y))
         
-        # take care last mini_batch separately
-        last_batch = all_data[num_batches*batch_size :, :]
-        last_X = last_batch[:, 0:-1]
-        last_Y = last_batch[:, -1]
-        batch_ls.append((last_X, last_Y))
+        # take care last mini_batch separately if batch_size not divisible
+        if (all_data.shape[0] % batch_size != 0) :
+            last_batch = all_data[num_batches*batch_size :, :]
+            last_X = last_batch[:, 0:-1]
+            last_Y = last_batch[:, -1]
+            batch_ls.append((last_X, last_Y))
             
         return batch_ls
         
@@ -98,24 +100,25 @@ class MLP:
         print('V: ', V.shape)
         
         Z = self.ReLu(np.dot(X,V)) #N x M     10000 x 10, hidden layer
-        print('input of ReLu: ', Z.shape)
+        print('input of ReLu: ', Z)
         
         N,D = X.shape
         Yh = self.softmax(np.dot(Z,W)) #N x K     10000 x 1
-        print('Yh: ', Yh.shape)
+        print('Yh: ', Yh)
         
-        dY = Yh - Y     #N x K     10000 x 10000
-        print('dY: ', dY.shape)
+        dY = Yh - Y     #N x K     10000 x 1
+        print('dY: ', dY)
         
-        dW = np.dot(Z.T, dY)/N  #M x K     10 x 10000
-        print('dW: ', dW.shape)
+        dW = np.dot(Z.T, dY)/N  #M x K     10 x 10000 
+        print('dW: ', dW)
         
         dZ = np.dot(dY, W.T)    #N x M
-        print('dZ: ', dZ.shape)
+        print('dZ: ', dZ)
         
-#        dV = np.dot(X.T, dZ * Z * (1-Z))/N #D x M
+#        dV = np.dot(X.T, dZ * Z * (1-Z))/N #D x M 
         dV = np.dot(X.T, dZ * self.ReLuGrad(Z))/N
-        print('dV: ', dV.shape)
+        print('dV: ', dV)
+        print('')
         return dW, dV
     
     
@@ -130,7 +133,7 @@ class MLP:
             batches = self.create_mini_batch(X, Y, batch_size)
             for batch in batches:
                 mini_X = batch[0]
-                mini_Y = batch[1]
+                mini_Y = batch[1][:,None]
                 
                 dW, dV = self.gradients(mini_X, mini_Y, W, V)
                 W = W - lr*dW
