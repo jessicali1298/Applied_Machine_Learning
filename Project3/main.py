@@ -3,8 +3,6 @@ import os
 import numpy as np
 import mlp as mlp
 
-mlp_nn = mlp.MLP()
-
 def unpickle(file):
     with open(file, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
@@ -20,15 +18,51 @@ for i in range(len(data_dir)):
     final_path = os.path.join(root_path, data_dir[i])
     dict_ls.append(unpickle(final_path))
 
-#print(dict_ls[0].keys())
 
-W,V = mlp_nn.GD(np.asarray(dict_ls[0][b'data']), np.asarray(dict_ls[0][b'labels'][:,None]), 
-                10, 0.1, 1e-9, 100000)
-#GD(self, X, Y, M, lr=0.1, eps=1e-9, max_iters=100000):
 
+
+X = np.asarray(dict_ls[0][b'data'])
+Y = np.asarray(dict_ls[0][b'labels'])[:, None]
+M = 10          # number of hiddne units
+lr = 0.1        # learning rate
+eps = 1e-9
+max_iters = 1
+batch_size = 5000
+
+N,D = X.shape
+N,K = Y.shape
+W = np.random.randn(M, K) * 0.01
+V = np.random.randn(D, M) * 0.01
+
+mlp_nn = mlp.MLP(W,V)
+mlp_nn.fit(X, Y, M, lr, eps, max_iters, batch_size)
+
+
+Wh = mlp_nn.W
+Vh = mlp_nn.V
+
+#%% check gradients
+
+#def func(x):
+#...     return x[0]**2 - 0.5 * x[1]**3
+#>>> def grad(x):
+#...     return [2 * x[0], -1.5 * x[1]**2]
+#>>> from scipy.optimize import check_grad
+#>>> check_grad(func, grad, [1.5, -1.5])
+#
+#from scipy.optimize import check_grad
+#cost = mlp_nn.cost(X,Y,W,V)
+#grad = mlp_nn.gradients(X,Y,W,V)
+#error = check_grad(cost, grad, )
+
+#%%
 #temp = np.asarray(dict_ls[0][b'labels'])[:,None]
 #
-#temp1 = np.array([[1,3,1],[1,4,2]])
+#temp1 = np.array([[1,1],[1,0],[1,0],[4,1],[2,1]])
+#temp1 = temp1[:1]
+#ls = []
+#temp3 = int(np.floor(1000/30))
+
 #temp1[temp1>1] = 999
 #print(temp1)
 #temp = np.empty(temp1.shape)
@@ -36,3 +70,4 @@ W,V = mlp_nn.GD(np.asarray(dict_ls[0][b'data']), np.asarray(dict_ls[0][b'labels'
 #print(idx1)
 #print(temp1[idx1[0], idx1[1]])
 #print(np.max(temp1, axis=-1)[:,None])
+
