@@ -51,12 +51,15 @@ class MLP:
     def softmax(self,
                 u # N x K
                 ):
-        print('softmax input: ', u)
+        print('softmax input: ', u.shape)
         u_exp = np.exp(u - np.max(u,1)[:, None])
         print('softmax - u_exp: ', u_exp)
         result = u_exp / np.sum(u_exp, axis=-1)[:, None]
-        print('result: ', result)
+        
+        print('result: ', result.shape)
+        print('new---------------------------------')
         return result
+    
     
     def cost(self,
              X, #N x D
@@ -110,7 +113,7 @@ class MLP:
         print('input of ReLu: ', Z)
         
         N,D = X.shape
-        Yh = self.softmax(np.dot(Z,W)) #N x K     10000 x 1
+        Yh = self.softmax(np.dot(Z,W)) #N x K     10000 x 10
         print('Yh: ', Yh)
         
         dY = Yh - Y     #N x K     10000 x 1
@@ -174,7 +177,7 @@ class MLP:
     def predict(self, X, Y, act_func):
         if (act_func == 'ReLu'):
             #g(W*h(Vx))
-            result = self.softmax(np.dot(self.W, self.ReLu(np.dot(self.V,X))))
+            result = self.softmax(np.dot(self.W * self.ReLu(np.dot(self.V,X))))
             
         elif (act_func == 'Tanh'):
             # do something

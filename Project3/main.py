@@ -37,7 +37,9 @@ V = np.random.randn(D, M) * 0.01
 mlp_nn = mlp.MLP(W,V)
 mlp_nn.fit(X, Y, M, lr, eps, max_iters, batch_size)
 
-
+#X_test = np.asarray(dict_ls[5][b'data'])
+#Y_test = np.asarray(dict_ls[5][b'labels'])[:, None]
+#mlp_nn.predict(X_test, Y_test, 'RELU')
 Wh = mlp_nn.W
 Vh = mlp_nn.V
 #%% check gradients
@@ -57,8 +59,8 @@ Vh = mlp_nn.V
 #%%
 #temp = np.asarray(dict_ls[0][b'labels'])[:,None]
 #
-temp1 = np.array([[1,1],[1,0],[1,0],[4,1],[2,1]])
-temp2 = temp1[[0,1,2],[0,1]]
+#temp1 = np.array([[1,1],[1,0],[1,0],[4,1],[2,1]])
+#temp2 = temp1[[0,1,2],[0,1]]
 #ls = []
 #temp3 = int(np.floor(1000/30))
 
