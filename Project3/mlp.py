@@ -84,15 +84,16 @@ class MLP:
         # create mini_batches
         for i in range(num_batches):
             mini_batch = all_data[i*batch_size : (i+1)*batch_size, :]
-            mini_X = mini_batch[:, 0:-1]
-            mini_Y = mini_batch[:, -1]
+            cols = mini_batch.shape[1] - 10
+            mini_X = mini_batch[:, 0:cols]
+            mini_Y = mini_batch[:, cols:]
             batch_ls.append((mini_X, mini_Y))
         
         # take care last mini_batch separately if batch_size not divisible
         if (all_data.shape[0] % batch_size != 0) :
             last_batch = all_data[num_batches*batch_size :, :]
-            last_X = last_batch[:, 0:-1]
-            last_Y = last_batch[:, -1]
+            last_X = last_batch[:, 0:(cols - 10)]
+            last_Y = last_batch[:, (cols - 10):-1]
             batch_ls.append((last_X, last_Y))
             
         return batch_ls
@@ -104,36 +105,36 @@ class MLP:
                   W, #M x K 
                   V  #D x M
                   ):
-        print('X: ', X.shape)
-        print('Y: ', Y.shape)
-        print('W: ', W.shape)
-        print('V: ', V.shape)
+#        print('X: ', X.shape)
+#        print('Y: ', Y.shape)
+#        print('W: ', W.shape)
+#        print('V: ', V.shape)
         
         Z = self.ReLu(np.dot(X,V)) #N x M     10000 x 10, hidden layer
-        print('input of ReLu: ', Z)
+#        print('input of ReLu: ', Z)
         
         N,D = X.shape
         Yh = self.softmax(np.dot(Z,W)) #N x K     10000 x 10
-        print('Yh: ', Yh)
+#        print('Yh: ', Yh)
         
         dY = Yh - Y     #N x K     10000 x 1
-        print('dY: ', dY)
+#        print('dY: ', dY)
         
         dW = np.dot(Z.T, dY)/N  #M x K     10 x 10 
-        print('dW: ', dW)
+#        print('dW: ', dW)
         
         dZ = np.dot(dY, W.T)    #N x M
-        print('dZ: ', dZ)
+#        print('dZ: ', dZ)
         
 #        dV = np.dot(X.T, dZ * Z * (1-Z))/N #D x M 
         dV = np.dot(X.T, dZ * self.ReLuGrad(Z))/N
-        print('dV: ', dV)
-        print('')
+#        print('dV: ', dV)
+#        print('')
         return dW, dV
     
     
     def mini_GD(self, X, Y, M, lr, eps, max_iters, batch_size):
-        Y = self.one_hot(Y)
+#        Y = self.one_hot(Y)
         N,D = X.shape
         N,K = Y.shape
         W = np.random.randn(M, K) * 0.01
@@ -141,15 +142,18 @@ class MLP:
         dW = np.inf * np.ones_like(W)
 
         for i in range(max_iters):
+            print('iteration: ', i)
             batches = self.create_mini_batch(X, Y, batch_size)
+            t = 0
             for batch in batches:
+                print('batch number: ', t)
                 mini_X = batch[0]
                 mini_Y = batch[1][:,None]
                 
                 dW, dV = self.gradients(mini_X, mini_Y, W, V)
                 W = W - lr*dW
                 V = V - lr*dV
-            
+                t = t + 1
         return W, V
    
     

@@ -8,8 +8,14 @@ def unpickle(file):
         dict = pickle.load(fo, encoding='bytes')
     return dict
 
-#root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
-root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
+def one_hot(Y):
+    N, C = Y.shape[0], (np.max(Y)+1)
+    y_hot = np.zeros([N, C])
+    y_hot[np.arange(N),Y.flatten()] = 1
+    return y_hot
+
+root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
+#root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
 data_dir = sorted(os.listdir(root_path))
 dict_ls = []
 
@@ -23,6 +29,7 @@ for i in range(len(data_dir)):
 
 X = np.asarray(dict_ls[0][b'data'])
 Y = np.asarray(dict_ls[0][b'labels'])[:, None]
+Y = one_hot(Y)
 M = 10          # number of hiddne units
 lr = 0.1        # learning rate
 eps = 1e-9
@@ -40,8 +47,9 @@ mlp_nn.fit(X, Y, M, lr, eps, max_iters, batch_size)
 #X_test = np.asarray(dict_ls[5][b'data'])
 #Y_test = np.asarray(dict_ls[5][b'labels'])[:, None]
 #mlp_nn.predict(X_test, Y_test, 'RELU')
-Wh = mlp_nn.W
-Vh = mlp_nn.V
+
+#Wh = mlp_nn.W
+#Vh = mlp_nn.V
 #%% check gradients
 
 #def func(x):
