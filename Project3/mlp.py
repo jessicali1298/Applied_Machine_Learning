@@ -133,6 +133,7 @@ class MLP:
     
     
     def mini_GD(self, X, Y, M, lr, eps, max_iters, batch_size):
+        Y = self.one_hot(Y)
         N,D = X.shape
         N,K = Y.shape
         W = np.random.randn(M, K) * 0.01
