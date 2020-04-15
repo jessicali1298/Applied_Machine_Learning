@@ -27,29 +27,50 @@ for i in range(len(data_dir)):
 
 
 
-X = np.asarray(dict_ls[0][b'data'])
-Y = np.asarray(dict_ls[0][b'labels'])[:, None]
-Y = one_hot(Y)
-M = 10          # number of hiddne units
-lr = 0.1        # learning rate
-eps = 1e-9
-max_iters = 1
-batch_size = 5000
+X_train = np.asarray(dict_ls[0][b'data'])
+Y_train = np.asarray(dict_ls[0][b'labels'])[:, None]
 
-N,D = X.shape
-N,K = Y.shape
+
+X_test = np.asarray(dict_ls[5][b'data'])
+Y_test = np.asarray(dict_ls[5][b'labels'])[:, None]
+Y_test = one_hot(Y_test)
+
+# concatenate all training data
+for i in range(1,4):
+    tempX = np.asarray(dict_ls[i][b'data'])
+    tempY = np.asarray(dict_ls[i][b'labels'])[:, None]
+    tempX = np.vstack((X_train,tempX))
+    tempY = np.vstack((Y_train, tempY))
+    X_train = tempX
+    Y_train = tempY
+
+Y_train = one_hot(Y_train)
+
+M = 10          # number of hiddne units
+lr = 0.1/10000  # learning rate
+eps = 1e-9
+max_iters = 15
+batch_size = 500
+
+N,D = X_train.shape
+N,K = Y_train.shape
 W = np.random.randn(M, K) * 0.01
 V = np.random.randn(D, M) * 0.01
 
 mlp_nn = mlp.MLP(W,V)
-mlp_nn.fit(X, Y, M, lr, eps, max_iters, batch_size)
+mlp_nn.fit(X_train, Y_train, M, lr, max_iters, batch_size)
 
-#X_test = np.asarray(dict_ls[5][b'data'])
-#Y_test = np.asarray(dict_ls[5][b'labels'])[:, None]
-#mlp_nn.predict(X_test, Y_test, 'RELU')
+#batches = mlp_nn.create_mini_batch(X,Y,batch_size)
+Wh = mlp_nn.W
+Vh = mlp_nn.V
 
-#Wh = mlp_nn.W
-#Vh = mlp_nn.V
+# test the model
+result, accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
+
+
+
+
+
 #%% check gradients
 
 #def func(x):
