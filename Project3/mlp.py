@@ -8,7 +8,7 @@
 
 import numpy as np
 
-class MLP:
+class mlp:
     def __init__(self, W, V):
         self.W = W
         self.V = V
@@ -51,13 +51,13 @@ class MLP:
     def softmax(self,
                 u # N x K
                 ):
-        print('softmax input: ', u.shape)
+#        print('softmax input: ', u.shape)
         u_exp = np.exp(u - np.max(u,1)[:, None])
-        print('softmax - u_exp: ', u_exp)
+#        print('softmax - u_exp: ', u_exp)
         result = u_exp / np.sum(u_exp, axis=-1)[:, None]
         
-        print('result: ', result.shape)
-        print('new---------------------------------')
+#        print('softmax result: ', result)
+#        print('new---------------------------------')
         return result
     
     
@@ -78,7 +78,6 @@ class MLP:
         all_data = np.hstack((X,Y))  # stack X and Y horizontally [[X1, Y1]...[Xn, Yn]]
         np.random.shuffle(all_data)  # shuffle data before creating batches
         num_batches = int(np.floor(all_data.shape[0] / batch_size))  # total number of mini_batches
-        
         batch_ls = []
         
         # create mini_batches
@@ -111,46 +110,50 @@ class MLP:
 #        print('V: ', V.shape)
         
         Z = self.ReLu(np.dot(X,V)) #N x M     10000 x 10, hidden layer
-#        print('input of ReLu: ', Z)
+#        print('input of ReLu: Z', Z.shape)
         
         N,D = X.shape
         Yh = self.softmax(np.dot(Z,W)) #N x K     10000 x 10
-#        print('Yh: ', Yh)
+#        print('Yh: ', Yh.shape)
         
-        dY = Yh - Y     #N x K     10000 x 1
-#        print('dY: ', dY)
+        dY = Yh - Y     #N x K     10000 x 10
+#        print('dY: ', dY.shape)
         
         dW = np.dot(Z.T, dY)/N  #M x K     10 x 10 
-#        print('dW: ', dW)
+#        print('dW: ', dW.shape)
         
-        dZ = np.dot(dY, W.T)    #N x M
-#        print('dZ: ', dZ)
+        dZ = np.dot(dY, W.T)    #N x M     10000 x 10
+#        print('dZ: ', dZ.shape)
         
 #        dV = np.dot(X.T, dZ * Z * (1-Z))/N #D x M 
-        dV = np.dot(X.T, dZ * self.ReLuGrad(Z))/N
-#        print('dV: ', dV)
+        hidden_grad = self.ReLuGrad(Z)
+#        print('hidden_grad: ')
+        dV = np.dot(X.T, dZ * hidden_grad)/N
+#        print('dV: ')
 #        print('')
         return dW, dV
     
     
-    def mini_GD(self, X, Y, M, lr, eps, max_iters, batch_size):
+    def mini_GD(self, X, Y, M, lr, max_iters, batch_size):
 
         N,D = X.shape
         N,K = Y.shape
         W = np.random.randn(M, K) * 0.01
         V = np.random.randn(D, M) * 0.01
-        dW = np.inf * np.ones_like(W)
+#        dW = np.inf * np.ones_like(W)    
 
         for i in range(max_iters):
-            print('iteration: ', i)
+#            print('iteration: ', i)
             batches = self.create_mini_batch(X, Y, batch_size)
             t = 0
             for batch in batches:
-                print('batch number: ', t)
+#                print('batch number: ', t)
                 mini_X = batch[0]
-                mini_Y = batch[1][:,None]
+                mini_Y = batch[1]
                 
                 dW, dV = self.gradients(mini_X, mini_Y, W, V)
+#                print('dW: ', dW.shape)
+#                print('W: ', W.shape)
                 W = W - lr*dW
                 V = V - lr*dV
                 t = t + 1
@@ -174,17 +177,16 @@ class MLP:
         return W, V
     
     
-    def fit(self, X, Y, M, lr, eps, max_iters, batch_size):
-        W, V = self.mini_GD(X, Y, M, lr, eps, max_iters, batch_size)
+    def fit(self, X, Y, M, lr, max_iters, batch_size):
+        W, V = self.mini_GD(X, Y, M, lr, max_iters, batch_size)
         self.W = W
         self.V = V
     
     
     def predict(self, X, Y, act_func):
-        if (act_func == 'ReLu'):
-            #g(W*h(Vx))
-            result = self.softmax(np.dot(self.W * self.ReLu(np.dot(self.V,X))))
-            
+        if (act_func == 'ReLu'): 
+            softmax_result = self.softmax(np.dot(self.ReLu(np.dot(X, self.V)), self.W))
+            result = self.one_hot(np.argmax(softmax_result, axis=1))
         elif (act_func == 'Tanh'):
             # do something
             print('Using Tanh')
@@ -195,7 +197,4 @@ class MLP:
             
         accuracy = np.mean(result == Y)
         return accuracy
-    
-    
-    
     

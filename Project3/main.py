@@ -2,6 +2,7 @@ import pickle
 import os
 import numpy as np
 import mlp as mlp
+import CrossValidation as cv
 
 def unpickle(file):
     with open(file, 'rb') as fo:
@@ -14,42 +15,72 @@ def one_hot(Y):
     y_hot[np.arange(N),Y.flatten()] = 1
     return y_hot
 
-#root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
-root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
-data_dir = sorted(os.listdir(root_path))
+
+root_path_Jessica = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
+root_path_Claire = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
+data_dir = sorted(os.listdir(root_path_Jessica))  # <-------
 dict_ls = []
 
 # All train and test data are loaded as a list of dict
 for i in range(len(data_dir)):
-    final_path = os.path.join(root_path, data_dir[i])
+    final_path = os.path.join(root_path_Jessica, data_dir[i]) # <---------
     dict_ls.append(unpickle(final_path))
 
 
 
 
-X = np.asarray(dict_ls[0][b'data'])
-Y = np.asarray(dict_ls[0][b'labels'])[:, None]
-Y = one_hot(Y)
-M = 10          # number of hiddne units
-lr = 0.1        # learning rate
-eps = 1e-9
-max_iters = 1
-batch_size = 5000
+X_train = np.asarray(dict_ls[0][b'data'])
+Y_train = np.asarray(dict_ls[0][b'labels'])[:, None]
 
-N,D = X.shape
-N,K = Y.shape
+
+X_test = np.asarray(dict_ls[5][b'data'])
+Y_test = np.asarray(dict_ls[5][b'labels'])[:, None]
+Y_test = one_hot(Y_test)
+
+# concatenate all training data
+for i in range(1,4):
+    tempX = np.asarray(dict_ls[i][b'data'])
+    tempY = np.asarray(dict_ls[i][b'labels'])[:, None]
+    tempX = np.vstack((X_train,tempX))
+    tempY = np.vstack((Y_train, tempY))
+    X_train = tempX
+    Y_train = tempY
+
+Y_train = one_hot(Y_train)
+
+M = 10          # number of hiddne units
+lr = 0.1/10000  # learning rate
+eps = 1e-9
+max_iters = 15
+batch_size = 500
+
+N,D = X_train.shape
+N,K = Y_train.shape
 W = np.random.randn(M, K) * 0.01
 V = np.random.randn(D, M) * 0.01
 
 mlp_nn = mlp.MLP(W,V)
-mlp_nn.fit(X, Y, M, lr, eps, max_iters, batch_size)
-
-#X_test = np.asarray(dict_ls[5][b'data'])
-#Y_test = np.asarray(dict_ls[5][b'labels'])[:, None]
-#mlp_nn.predict(X_test, Y_test, 'RELU')
-
+#%%
+#mlp_nn.fit(X_train, Y_train, M, lr, max_iters, batch_size)
+#
+#
 #Wh = mlp_nn.W
 #Vh = mlp_nn.V
+#
+## test the model
+#accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
+
+#%%
+# 5-fold cross validation
+cv_obj = cv.CrossValidation()
+cv_accuracy, avg_cv_accuracy = cv_obj.cross_validation(X_train, Y_train, M, lr, max_iters, batch_size, 5, 'ReLu')
+
+#folds_X, folds_Y = cv_obj.create_mini_batch(X_train, Y_train, 8000)
+#X_test = folds_X[0]
+#Y_test = folds_Y[0]
+#X_train = np.concatenate(np.delete(folds_X,0,0), axis=0)
+#Y_train = np.delete(folds_Y,0,0)
+
 #%% check gradients
 
 #def func(x):
@@ -67,7 +98,9 @@ mlp_nn.fit(X, Y, M, lr, eps, max_iters, batch_size)
 #%%
 #temp = np.asarray(dict_ls[0][b'labels'])[:,None]
 #
-#temp1 = np.array([[1,1],[1,0],[1,0],[4,1],[2,1]])
+#temp1 = np.array([[1,1],[1,0],[9,0],[4,1],[2,1]])
+#temp3 = np.delete(temp1,2,0)[:,0]
+#temp2 = np.concatenate(np.delete(temp1,2,0), axis=0)
 #temp2 = temp1[[0,1,2],[0,1]]
 #ls = []
 #temp3 = int(np.floor(1000/30))
