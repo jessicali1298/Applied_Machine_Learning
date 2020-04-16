@@ -14,8 +14,8 @@ def one_hot(Y):
     y_hot[np.arange(N),Y.flatten()] = 1
     return y_hot
 
-root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
-#root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
+#root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
+root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
 data_dir = sorted(os.listdir(root_path))
 dict_ls = []
 
