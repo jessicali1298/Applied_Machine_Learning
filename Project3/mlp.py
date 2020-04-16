@@ -8,7 +8,7 @@
 
 import numpy as np
 
-class MLP:
+class mlp:
     def __init__(self, W, V):
         self.W = W
         self.V = V
