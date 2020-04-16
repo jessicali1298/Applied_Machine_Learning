@@ -15,14 +15,14 @@ def one_hot(Y):
     y_hot[np.arange(N),Y.flatten()] = 1
     return y_hot
 
-root_path = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
-#root_path = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
-data_dir = sorted(os.listdir(root_path))
+root_path_Jessica = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
+root_path_Claire = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
+data_dir = sorted(os.listdir(root_path_Jessica))  # <-------
 dict_ls = []
 
 # All train and test data are loaded as a list of dict
 for i in range(len(data_dir)):
-    final_path = os.path.join(root_path, data_dir[i])
+    final_path = os.path.join(root_path_Jessica, data_dir[i]) # <---------
     dict_ls.append(unpickle(final_path))
 
 
@@ -59,6 +59,7 @@ W = np.random.randn(M, K) * 0.01
 V = np.random.randn(D, M) * 0.01
 
 mlp_nn = mlp.MLP(W,V)
+#%%
 #mlp_nn.fit(X_train, Y_train, M, lr, max_iters, batch_size)
 #
 #
@@ -68,6 +69,7 @@ mlp_nn = mlp.MLP(W,V)
 ## test the model
 #accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
 
+#%%
 # 5-fold cross validation
 cv_obj = cv.CrossValidation()
 cv_accuracy, avg_cv_accuracy = cv_obj.cross_validation(X_train, Y_train, M, lr, max_iters, batch_size, 5, 'ReLu')
