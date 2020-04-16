@@ -78,7 +78,6 @@ class MLP:
         all_data = np.hstack((X,Y))  # stack X and Y horizontally [[X1, Y1]...[Xn, Yn]]
         np.random.shuffle(all_data)  # shuffle data before creating batches
         num_batches = int(np.floor(all_data.shape[0] / batch_size))  # total number of mini_batches
-        
         batch_ls = []
         
         # create mini_batches
@@ -144,11 +143,11 @@ class MLP:
 #        dW = np.inf * np.ones_like(W)    
 
         for i in range(max_iters):
-            print('iteration: ', i)
+#            print('iteration: ', i)
             batches = self.create_mini_batch(X, Y, batch_size)
             t = 0
             for batch in batches:
-                print('batch number: ', t)
+#                print('batch number: ', t)
                 mini_X = batch[0]
                 mini_Y = batch[1]
                 
@@ -197,8 +196,5 @@ class MLP:
             print('Using Sigmoid')
             
         accuracy = np.mean(result == Y)
-        return result, accuracy
-    
-    
-    
+        return accuracy
     

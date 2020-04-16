@@ -2,6 +2,7 @@ import pickle
 import os
 import numpy as np
 import mlp as mlp
+import CrossValidation as cv
 
 def unpickle(file):
     with open(file, 'rb') as fo:
@@ -58,18 +59,24 @@ W = np.random.randn(M, K) * 0.01
 V = np.random.randn(D, M) * 0.01
 
 mlp_nn = mlp.MLP(W,V)
-mlp_nn.fit(X_train, Y_train, M, lr, max_iters, batch_size)
+#mlp_nn.fit(X_train, Y_train, M, lr, max_iters, batch_size)
+#
+#
+#Wh = mlp_nn.W
+#Vh = mlp_nn.V
+#
+## test the model
+#accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
 
-#batches = mlp_nn.create_mini_batch(X,Y,batch_size)
-Wh = mlp_nn.W
-Vh = mlp_nn.V
+# 5-fold cross validation
+cv_obj = cv.CrossValidation()
+cv_accuracy, avg_cv_accuracy = cv_obj.cross_validation(X_train, Y_train, M, lr, max_iters, batch_size, 5, 'ReLu')
 
-# test the model
-result, accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
-
-
-
-
+#folds_X, folds_Y = cv_obj.create_mini_batch(X_train, Y_train, 8000)
+#X_test = folds_X[0]
+#Y_test = folds_Y[0]
+#X_train = np.concatenate(np.delete(folds_X,0,0), axis=0)
+#Y_train = np.delete(folds_Y,0,0)
 
 #%% check gradients
 
@@ -88,7 +95,9 @@ result, accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
 #%%
 #temp = np.asarray(dict_ls[0][b'labels'])[:,None]
 #
-#temp1 = np.array([[1,1],[1,0],[1,0],[4,1],[2,1]])
+#temp1 = np.array([[1,1],[1,0],[9,0],[4,1],[2,1]])
+#temp3 = np.delete(temp1,2,0)[:,0]
+#temp2 = np.concatenate(np.delete(temp1,2,0), axis=0)
 #temp2 = temp1[[0,1,2],[0,1]]
 #ls = []
 #temp3 = int(np.floor(1000/30))
