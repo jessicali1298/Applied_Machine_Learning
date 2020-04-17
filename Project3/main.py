@@ -104,7 +104,12 @@ predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
 #%%
 #temp = np.asarray(dict_ls[0][b'labels'])[:,None]
 #
-#temp1 = np.array([[1,1],[1,0],[9,0],[4,1],[2,1]])
+#temp1 = np.array([[1,1],[1,0]])
+#temp2 = np.array([[2,3],[4,1]])
+#temp3 = temp1*temp2
+#temp4 = np.dot(temp1, temp2)
+#print(temp3 == temp4)
+
 #temp3 = np.delete(temp1,2,0)[:,0]
 #temp2 = np.concatenate(np.delete(temp1,2,0), axis=0)
 #temp2 = temp1[[0,1,2],[0,1]]

@@ -8,7 +8,7 @@
 
 import numpy as np
 
-class mlp:
+class mlp_three:
     def __init__(self, W, V):
         self.W = W
         self.V = V
@@ -51,13 +51,8 @@ class mlp:
     def softmax(self,
                 u # N x K
                 ):
-#        print('softmax input: ', u.shape)
         u_exp = np.exp(u - np.max(u,1)[:, None])
-#        print('softmax - u_exp: ', u_exp)
         result = u_exp / np.sum(u_exp, axis=-1)[:, None]
-        
-#        print('softmax result: ', result)
-#        print('new---------------------------------')
         return result
     
     
@@ -128,14 +123,54 @@ class mlp:
 
         return dW, dV
     
+        # assume middle layer activation function is ReLu
+    def gradients_three(self,
+                  X, #N x D
+                  Y, #N x K
+                  W, #M2 x K 
+                  P, #M1 x M2
+                  V, #D x M1
+                  act_func
+                  ):
+#        print('X: ', X.shape)
+#        print('Y: ', Y.shape)
+#        print('W: ', W.shape)
+#        print('P: ', P.shape)
+#        print('V: ', V.shape)
+        if act_func == 'ReLu':
+            Z2 = self.ReLu(np.dot(X,V))   #N x M1     10000 x 10, hidden layer
+            Z1 = self.ReLu(np.dot(Z2,P))  #N x M2
+    #        print('input of ReLu: Z', Z.shape)
+            
+            N,D = X.shape
+            Yh = self.softmax(np.dot(Z1,W)) #N x K     10000 x 10
+    #        print('Yh: ', Yh.shape)
+            
+            dY = Yh - Y     #N x K     10000 x 10
+    #        print('dY: ', dY.shape)
+            
+            dW = np.dot(Z1.T, dY)/N  #M2 x K     
+#            print('dW: ', dW.shape)
+            
+            # compute dP (1st hidden layer counting from output)
+            dZ1 = np.dot(dY, W.T)   #N x M2
+            hidden_grad1 = self.ReLuGrad(Z1)  #N x M2
+            dP = np.dot(Z2.T, dZ1 * hidden_grad1)/N  #(M1 x M2)
+            
+            # compute dV (2nd hidden layer counting from output)
+            dZ2 = np.dot(dZ1 * hidden_grad1, P.T) #(N x M2)(M2 x M1) = N x M1
+            hidden_grad2 = self.ReLuGrad(Z2) # (N x M1)
+            dV = np.dot(X.T, dZ2 * hidden_grad2)/N # (D x N)(N x M1) = D x M1
+            
+        return dW, dP, dV
     
-    
-    def mini_GD(self, X, Y, M, lr, max_iters, batch_size, act_func):
+    def mini_GD_three(self, X, Y, M1, M2, lr, max_iters, batch_size, act_func):
 
         N,D = X.shape
         N,K = Y.shape
-        W = np.random.randn(M, K) * 0.01
-        V = np.random.randn(D, M) * 0.01
+        W = np.random.randn(M2, K) * 0.01
+        P = np.random.randn(M1,M2) * 0.01
+        V = np.random.randn(D, M1) * 0.01
 #        dW = np.inf * np.ones_like(W)    
 
         for i in range(max_iters):
@@ -147,24 +182,26 @@ class mlp:
                 mini_X = batch[0]
                 mini_Y = batch[1]
                 
-                dW, dV = self.gradients(mini_X, mini_Y, W, V, act_func)
+                dW, dV = self.gradients_three(mini_X, mini_Y, W, P, V, act_func)
 #                print('dW: ', dW.shape)
 #                print('W: ', W.shape)
                 W = W - lr*dW
                 V = V - lr*dV
                 t = t + 1
-        return W, V
+        return W, P, V
     
     
-    def fit(self, X, Y, M, lr, max_iters, batch_size, act_func):
-        W, V = self.mini_GD(X, Y, M, lr, max_iters, batch_size, act_func)
+    def fit_three(self, X, Y, M1, M2, lr, max_iters, batch_size, act_func):
+        W, P, V = self.mini_GD_three(X, Y, M1, M2, lr, max_iters, batch_size, act_func)
         self.W = W
+        self.P = P
         self.V = V
     
     
-    def predict(self, X, Y, act_func):
+    def predict_three(self, X, Y, act_func):
         if (act_func == 'ReLu'): 
-            softmax_result = self.softmax(np.dot(self.ReLu(np.dot(X, self.V)), self.W))
+            temp = self.ReLu(np.dot(self.ReLu(np.dot(X, self.V)), self.P))
+            softmax_result = self.softmax(np.dot(temp, self.W))
             
             
         elif (act_func == 'Tanh'):
@@ -174,7 +211,8 @@ class mlp:
         elif(act_func == 'Sigmoid'):
             # do something
             print('Using Sigmoid')
-        result = np.argmax(self.one_hot(np.argmax(softmax_result, axis=1)), axis=1)  
+            
+        result = np.argmax(softmax_result, axis=1) 
         Y_decode = np.argmax(Y, axis=1) 
         accuracy = np.mean(result == Y_decode)
         return result, accuracy
