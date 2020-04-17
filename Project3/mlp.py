@@ -102,6 +102,37 @@ class mlp:
                   X, #N x D
                   Y, #N x K
                   W, #M x K 
+                  V,  #D x M
+                  act_func
+                  ):
+#        print('X: ', X.shape)
+#        print('Y: ', Y.shape)
+#        print('W: ', W.shape)
+#        print('V: ', V.shape)
+        
+        if act_func == 'ReLu':
+            Z = self.ReLu(np.dot(X,V)) #N x M     10000 x 10, hidden layer
+            
+            N,D = X.shape
+            Yh = self.softmax(np.dot(Z,W)) #N x K     10000 x 10
+            
+            dY = Yh - Y     #N x K     10000 x 10
+            
+            dW = np.dot(Z.T, dY)/N  #M x K     10 x 10 
+            
+            dZ = np.dot(dY, W.T)    #N x M     10000 x 10
+            
+            hidden_grad = self.ReLuGrad(Z)
+           
+        dV = np.dot(X.T, dZ * hidden_grad)/N
+
+        return dW, dV
+    
+        # assume middle layer activation function is ReLu
+    def gradients_old(self,
+                  X, #N x D
+                  Y, #N x K
+                  W, #M x K 
                   V  #D x M
                   ):
 #        print('X: ', X.shape)
@@ -133,8 +164,7 @@ class mlp:
 #        print('')
         return dW, dV
     
-    
-    def mini_GD(self, X, Y, M, lr, max_iters, batch_size):
+    def mini_GD(self, X, Y, M, lr, max_iters, batch_size, act_func):
 
         N,D = X.shape
         N,K = Y.shape
@@ -151,34 +181,17 @@ class mlp:
                 mini_X = batch[0]
                 mini_Y = batch[1]
                 
-                dW, dV = self.gradients(mini_X, mini_Y, W, V)
+                dW, dV = self.gradients(mini_X, mini_Y, W, V, act_func)
 #                print('dW: ', dW.shape)
 #                print('W: ', W.shape)
                 W = W - lr*dW
                 V = V - lr*dV
                 t = t + 1
         return W, V
-   
-    
-    def GD(self, X, Y, M, lr, eps, max_iters):
-        Y = self.one_hot(Y)
-        N,D = X.shape
-        N,K = Y.shape
-        W = np.random.randn(M, K) * 0.01
-        V = np.random.randn(D, M) * 0.01
-        dW = np.inf * np.ones_like(W)
-        t = 0
-
-        while np.linalg.norm(dW) > eps and t < max_iters:
-            dW, dV = self.gradients(X, Y, W, V)
-            W = W - lr*dW
-            V = V - lr*dV
-            t += 1
-        return W, V
     
     
-    def fit(self, X, Y, M, lr, max_iters, batch_size):
-        W, V = self.mini_GD(X, Y, M, lr, max_iters, batch_size)
+    def fit(self, X, Y, M, lr, max_iters, batch_size, act_func):
+        W, V = self.mini_GD(X, Y, M, lr, max_iters, batch_size, act_func)
         self.W = W
         self.V = V
     
@@ -186,7 +199,8 @@ class mlp:
     def predict(self, X, Y, act_func):
         if (act_func == 'ReLu'): 
             softmax_result = self.softmax(np.dot(self.ReLu(np.dot(X, self.V)), self.W))
-            result = self.one_hot(np.argmax(softmax_result, axis=1))
+            
+            
         elif (act_func == 'Tanh'):
             # do something
             print('Using Tanh')
@@ -194,7 +208,8 @@ class mlp:
         elif(act_func == 'Sigmoid'):
             # do something
             print('Using Sigmoid')
-            
-        accuracy = np.mean(result == Y)
-        return accuracy
+        result = np.argmax(self.one_hot(np.argmax(softmax_result, axis=1)), axis=1)  
+        Y_decode = np.argmax(Y, axis=1) 
+        accuracy = np.mean(result == Y_decode)
+        return result, accuracy
     

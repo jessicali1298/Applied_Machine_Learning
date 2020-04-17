@@ -33,33 +33,35 @@ class CrossValidation:
         fold_size = int(np.floor(X.shape[0]/k))
         accuracy_ls = []
         
-        if (act_func == 'ReLu'): 
-            folds_X, folds_Y = self.create_mini_batch(X, Y, fold_size)
-            folds_X = np.asarray(folds_X)
-            folds_Y = np.asarray(folds_Y)
-            
-            for i in range(k):
-                X_test = folds_X[i]
-                Y_test = folds_Y[i]
-                X_train = np.concatenate(np.delete(folds_X,i,0), axis=0)
-                Y_train = np.concatenate(np.delete(folds_Y,i,0), axis=0)
-                
-                N,D = X_train.shape
-                N,K = Y_train.shape
-                W = np.random.randn(M, K) * 0.01
-                V = np.random.randn(D, M) * 0.01
-                mlp_nn = mlp.MLP(W,V)
-                
-                mlp_nn.fit(X_train, Y_train, M, lr, max_iters, batch_size)
-                accuracy = mlp_nn.predict(X_test, Y_test, act_func)
-                accuracy_ls.append(accuracy)
+         
+        folds_X, folds_Y = self.create_mini_batch(X, Y, fold_size)
+        folds_X = np.asarray(folds_X)
+        folds_Y = np.asarray(folds_Y)
         
-        elif (act_func == 'Tanh'):
-            # do something
-            print('Using Tanh')
+        for i in range(k):
+            X_test = folds_X[i]
+            Y_test = folds_Y[i]
+            X_train = np.concatenate(np.delete(folds_X,i,0), axis=0)
+            Y_train = np.concatenate(np.delete(folds_Y,i,0), axis=0)
             
-        elif(act_func == 'Sigmoid'):
-            # do something
-            print('Using Sigmoid')
+            N,D = X_train.shape
+            N,K = Y_train.shape
+            W = np.random.randn(M, K) * 0.01
+            V = np.random.randn(D, M) * 0.01
+            mlp_nn = mlp.mlp(W,V)
+            
+            mlp_nn.fit(X_train, Y_train, M, lr, max_iters, batch_size, act_func)
+            predictions, accuracy = mlp_nn.predict(X_test, Y_test, act_func)
+            accuracy_ls.append(accuracy)
+            
+#        if (act_func == 'ReLu'):
+#            
+#        elif (act_func == 'Tanh'):
+#            # do something
+#            print('Using Tanh')
+#            
+#        elif(act_func == 'Sigmoid'):
+#            # do something
+#            print('Using Sigmoid')
     
         return accuracy_ls, np.mean(accuracy_ls)

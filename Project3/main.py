@@ -47,32 +47,38 @@ for i in range(1,4):
 
 Y_train = one_hot(Y_train)
 
-M = 10          # number of hiddne units
+M = 200          # number of hidden units
 lr = 0.1/10000  # learning rate
 eps = 1e-9
-max_iters = 15
-batch_size = 500
+max_iters = 40
+batch_size = 40
 
 N,D = X_train.shape
 N,K = Y_train.shape
 W = np.random.randn(M, K) * 0.01
 V = np.random.randn(D, M) * 0.01
 
-mlp_nn = mlp.MLP(W,V)
+mlp_nn = mlp.mlp(W,V)
 #%%
-#mlp_nn.fit(X_train, Y_train, M, lr, max_iters, batch_size)
-#
-#
-#Wh = mlp_nn.W
-#Vh = mlp_nn.V
-#
-## test the model
-#accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
+mlp_nn.fit(X_train, Y_train, M, lr, max_iters, batch_size, 'ReLu')
+
+
+Wh = mlp_nn.W
+Vh = mlp_nn.V
+
+# test the model
+predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
 
 #%%
 # 5-fold cross validation
-cv_obj = cv.CrossValidation()
-cv_accuracy, avg_cv_accuracy = cv_obj.cross_validation(X_train, Y_train, M, lr, max_iters, batch_size, 5, 'ReLu')
+#cv_obj = cv.CrossValidation()
+#cv_accuracy, avg_cv_accuracy = cv_obj.cross_validation(X_train, Y_train, M, lr, max_iters, batch_size, 5, 'ReLu')
+
+
+#temp1 = np.argmax(np.array([[0,0,0,1,0,0], [1,0,0,0,0,0], [0,1,0,0,0,0]]),axis=1)
+#temp2 = np.argmax(np.array([[0,0,0,1,0,0], [1,0,0,0,0,0], [1,0,0,0,0,0]]), axis=1)
+#temp3 = np.array([[0,0,0,1,0,0], [1,0,0,0,0,0], [0,1,0,0,0,0]])
+#result = np.mean(temp1 == temp2)
 
 #folds_X, folds_Y = cv_obj.create_mini_batch(X_train, Y_train, 8000)
 #X_test = folds_X[0]
