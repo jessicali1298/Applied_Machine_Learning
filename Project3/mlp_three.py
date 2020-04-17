@@ -9,8 +9,9 @@
 import numpy as np
 
 class mlp_three:
-    def __init__(self, W, V):
+    def __init__(self, W, P, V):
         self.W = W
+        self.P = P
         self.V = V
     
     def ReLu(self, z):
@@ -182,10 +183,11 @@ class mlp_three:
                 mini_X = batch[0]
                 mini_Y = batch[1]
                 
-                dW, dV = self.gradients_three(mini_X, mini_Y, W, P, V, act_func)
+                dW, dP, dV = self.gradients_three(mini_X, mini_Y, W, P, V, act_func)
 #                print('dW: ', dW.shape)
 #                print('W: ', W.shape)
                 W = W - lr*dW
+                P = P - lr*dP
                 V = V - lr*dV
                 t = t + 1
         return W, P, V

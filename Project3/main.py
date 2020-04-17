@@ -2,6 +2,7 @@ import pickle
 import os
 import numpy as np
 import mlp as mlp
+import mlp_three as mlp_3
 import CrossValidation as cv
 
 def unpickle(file):
@@ -48,32 +49,49 @@ for i in range(1,4):
 
 Y_train = one_hot(Y_train)
 
-M = 200          # number of hidden units
+M1 = 400          # number of hidden units
+M2 = 200
 lr = 0.1/10000  # learning rate
 eps = 1e-9
-max_iters = 40
+max_iters = 50
 batch_size = 40
 
 N,D = X_train.shape
 N,K = Y_train.shape
-W = np.random.randn(M, K) * 0.01
-V = np.random.randn(D, M) * 0.01
+W = np.random.randn(M2, K) * 0.01
+P = np.random.randn(M1, M2) * 0.01
+V = np.random.randn(D, M1) * 0.01
 
-mlp_nn = mlp.mlp(W,V)
 #%%
-mlp_nn.fit(X_train, Y_train, M, lr, max_iters, batch_size, 'ReLu')
-
-
-Wh = mlp_nn.W
-Vh = mlp_nn.V
-
-# test the model
-predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
+#mlp_nn = mlp.mlp(W,V)
+#
+#mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'ReLu')
+#
+#
+#Wh = mlp_nn.W
+#Vh = mlp_nn.V
+#
+## test the model
+#predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
 
 #%%
 # 5-fold cross validation
 #cv_obj = cv.CrossValidation()
 #cv_accuracy, avg_cv_accuracy = cv_obj.cross_validation(X_train, Y_train, M, lr, max_iters, batch_size, 5, 'ReLu')
+
+#%%
+# test 3-layer MLP
+mlp_nn3 = mlp_3.mlp_three(W,P,V)
+mlp_nn3.fit_three(X_train, Y_train, M1, M2, lr, max_iters, batch_size, 'ReLu')
+
+
+Wh3 = mlp_nn3.W
+Ph3 = mlp_nn3.P
+Vh3 = mlp_nn3.V
+
+# test the model
+predictions, accuracy = mlp_nn3.predict_three(X_test, Y_test, 'ReLu')
+
 
 
 #temp1 = np.argmax(np.array([[0,0,0,1,0,0], [1,0,0,0,0,0], [0,1,0,0,0,0]]),axis=1)
