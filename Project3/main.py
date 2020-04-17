@@ -49,9 +49,9 @@ for i in range(1,4):
 
 Y_train = one_hot(Y_train)
 
-M1 = 400          # number of hidden units
+M1 = 200          # number of hidden units
 M2 = 200
-lr = 0.1/10000  # learning rate
+lr = 0.1/6000  # learning rate
 eps = 1e-9
 max_iters = 50
 batch_size = 40

@@ -159,8 +159,8 @@ class mlp_three:
             dP = np.dot(Z2.T, dZ1 * hidden_grad1)/N  #(M1 x M2)
             
             # compute dV (2nd hidden layer counting from output)
-            dZ2 = np.dot(dZ1 * hidden_grad1, P.T) #(N x M2)(M2 x M1) = N x M1
-            hidden_grad2 = self.ReLuGrad(Z2) # (N x M1)
+            dZ2 = np.dot(dZ1 * hidden_grad1, P.T)  #(N x M2)(M2 x M1) = N x M1
+            hidden_grad2 = self.ReLuGrad(Z2)       # (N x M1)
             dV = np.dot(X.T, dZ2 * hidden_grad2)/N # (D x N)(N x M1) = D x M1
             
         return dW, dP, dV
@@ -175,7 +175,7 @@ class mlp_three:
 #        dW = np.inf * np.ones_like(W)    
 
         for i in range(max_iters):
-#            print('iteration: ', i)
+            print('iteration: ', i)
             batches = self.create_mini_batch(X, Y, batch_size)
             t = 0
             for batch in batches:
