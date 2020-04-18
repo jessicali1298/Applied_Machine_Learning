@@ -53,7 +53,7 @@ M1 = 200          # number of hidden units
 M2 = 200
 lr = 0.1/6000  # learning rate
 eps = 1e-9
-max_iters = 50
+max_iters = 2
 batch_size = 40
 
 N,D = X_train.shape
@@ -65,14 +65,16 @@ V = np.random.randn(D, M1) * 0.01
 #%%
 mlp_nn = mlp.mlp(W,V)
 
-mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'Leaky_ReLu')
-
-
+#mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'ReLu')
+#mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'Leaky_ReLu')
+mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'Soft_Plus')
 Wh = mlp_nn.W
 Vh = mlp_nn.V
 
 # test the model
-predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'Leaky_ReLu')
+#predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
+#predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'Leaky_ReLu')
+predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'Soft_Plus')
 
 #%%
 # 5-fold cross validation

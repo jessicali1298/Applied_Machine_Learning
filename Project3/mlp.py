@@ -23,15 +23,23 @@ class mlp:
         return z
         
     def LeakyRelu(self, z):
-        print (z)
         u = np.ones(z.shape)
         u[z<0] = np.double(0.01)
-        z = z*u.T
+        z = z*u
         return z
     
     def LeakyReluGD(self, z):
         u = np.ones(z.shape)
         u[z<=0] = np.double(0.01)
+        return u
+    
+    def SoftPlus (self, z):
+        z = np.log(1+np.exp(z))
+        return z
+    
+    def SoftPlusGD(self, z):
+        exp_z = np.exp(z)
+        u = exp_z /(1+exp_z)
         return u
     
     def logistic(self, z):
@@ -149,6 +157,19 @@ class mlp:
             dZ = np.dot(dY, W.T)    #N x M     10000 x 10
             
             hidden_grad = self.LeakyReluGD(Z)
+        elif act_func == 'Soft_Plus':
+            Z = self.SoftPlus(np.dot(X,V)) #N x M     10000 x 10, hidden layer
+            
+            N,D = X.shape
+            Yh = self.softmax(np.dot(Z,W)) #N x K     10000 x 10
+            
+            dY = Yh - Y     #N x K     10000 x 10
+            
+            dW = np.dot(Z.T, dY)/N  #M x K     10 x 10 
+            
+            dZ = np.dot(dY, W.T)    #N x M     10000 x 10
+            
+            hidden_grad = self.SoftPlusGD(Z)
            
         dV = np.dot(X.T, dZ * hidden_grad)/N
 
@@ -191,9 +212,10 @@ class mlp:
     def predict(self, X, Y, act_func):
         if (act_func == 'ReLu'): 
             softmax_result = self.softmax(np.dot(self.ReLu(np.dot(X, self.V)), self.W))
-            
         elif (act_func == 'Leaky_ReLu'):
             softmax_result = self.softmax(np.dot(self.LeakyRelu(np.dot(X, self.V)), self.W))
+        elif (act_func == 'Soft_Plus'):
+            softmax_result = self.softmax(np.dot(self.SoftPlus(np.dot(X, self.V)), self.W))
         elif (act_func == 'Tanh'):
             # do something
             print('Using Tanh')
