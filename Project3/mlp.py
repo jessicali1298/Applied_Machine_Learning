@@ -9,10 +9,11 @@
 import numpy as np
 
 class mlp:
-    def __init__(self, W, V, train_epoch_acc, test_epoch_acc):
+    def __init__(self, W, V, train_epoch_acc, valid_epoch_acc, test_epoch_acc):
         self.W = W
         self.V = V
         self.train_epoch_cc = train_epoch_acc
+        self.valid_epoch_acc = valid_epoch_acc
         self.test_epoch_cc = test_epoch_acc
     
     def ReLu(self, z):
@@ -187,6 +188,7 @@ class mlp:
         V = np.random.randn(D, M) * 0.01
   
         train_epoch_ls = []
+        valid_epoch_ls = []
         test_epoch_ls = []
         for i in range(max_iters):
             print('iteration: ', i)
@@ -204,12 +206,15 @@ class mlp:
                 self.W = W
                 self.V = V
                 t = t + 1
-            predictions_train, train_epoch = self.predict(X2, Y2, act_func)
+            predictions_train, train_epoch = self.predict(X, Y, act_func)
+            predictions_valid, valid_epoch = self.predict(X2, Y2, act_func)
             predictions_test, test_epoch = self.predict(X3, Y3, act_func)
             train_epoch_ls.append(train_epoch)
+            valid_epoch_ls.append(valid_epoch)
             test_epoch_ls.append(test_epoch)
             
         self.train_epoch_acc = train_epoch_ls
+        self.valid_epoch_acc = valid_epoch_ls
         self.test_epoch_acc = test_epoch_ls
         return W, V
     

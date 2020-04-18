@@ -51,8 +51,8 @@ for i in range(1,4):
 
 Y_train = one_hot(Y_train)
 
-M1 = 1000          # number of hidden units
-M2 = 200
+M1 = 1024          # number of hidden units
+M2 = 256
 
 # lr = 0.1/6000  # learning rate
 # eps = 1e-9
@@ -60,8 +60,8 @@ M2 = 200
 # batch_size = 40
 
 lr = 0.1/800  # learning rate
-max_iters = 8 #40
-batch_size = 2000 #40
+max_iters = 10 #40
+batch_size = 1250 #40
 
 
 N,D = X_train.shape
@@ -76,24 +76,24 @@ test_acc_ls3 = []
 
 #%%
 
-mlp_nn = mlp.mlp(W,V,train_acc_ls, test_acc_ls)
-
-#mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'ReLu')
-#mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'Leaky_ReLu')
-mlp_nn.fit(X_train, Y_train, X_valid, Y_valid, X_test, Y_test, 
-           M1, lr, max_iters, batch_size, 'Soft_Plus')
-Wh = mlp_nn.W
-Vh = mlp_nn.V
-
-# test the model
-#predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
-#predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'Leaky_ReLu')
-#predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'Soft_Plus')
-
-
-# can check train/test accuracy at each Epoch
-train_epoch = mlp_nn.train_epoch_acc
-test_epoch = mlp_nn.test_epoch_acc
+#mlp_nn = mlp.mlp(W,V,train_acc_ls, test_acc_ls)
+#
+##mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'ReLu')
+##mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'Leaky_ReLu')
+#mlp_nn.fit(X_train, Y_train, X_valid, Y_valid, X_test, Y_test, 
+#           M1, lr, max_iters, batch_size, 'Soft_Plus')
+#Wh = mlp_nn.W
+#Vh = mlp_nn.V
+#
+## test the model
+##predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
+##predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'Leaky_ReLu')
+##predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'Soft_Plus')
+#
+#
+## can check train/test accuracy at each Epoch
+#train_epoch = mlp_nn.train_epoch_acc
+#test_epoch = mlp_nn.test_epoch_acc
 
 
 #%%
@@ -110,17 +110,17 @@ test_epoch = mlp_nn.test_epoch_acc
 #batch_size_ls = [20,40,80,100,200,400,800,1000,2000]
 #
 #accuracy_ls = []
-#for i in range(1):
-#    mlp_nn3 = mlp_3.mlp_three(W,P,V, train_acc_ls3, test_acc_ls3)
-#    mlp_nn3.fit_three(X_train, Y_train, X_valid, Y_valid, X_test, Y_test, 
-#                      M1, M2, lr, max_iters, batch_size, 'ReLu')
-#    
-#    # test the model
-##    predictions, accuracy = mlp_nn3.predict_three(X_test, Y_test, 'ReLu')
-##    accuracy_ls.append(accuracy)
-#
-#train_epoch3 = mlp_nn3.train_epoch_acc
-#test_epoch3 = mlp_nn3.test_epoch_acc
+for i in range(1):
+    mlp_nn3 = mlp_3.mlp_three(W,P,V, train_acc_ls3, test_acc_ls3)
+    mlp_nn3.fit_three(X_train, Y_train, X_valid, Y_valid, X_test, Y_test, 
+                      M1, M2, lr, max_iters, batch_size, 'ReLu')
+    
+    # test the model
+#    predictions, accuracy = mlp_nn3.predict_three(X_valid, Y_valid, 'ReLu')
+#    accuracy_ls.append(accuracy)
+
+train_epoch3 = mlp_nn3.train_epoch_acc
+test_epoch3 = mlp_nn3.test_epoch_acc
 
 
 #%%
