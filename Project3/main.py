@@ -70,13 +70,15 @@ W = np.random.randn(M2, K) * 0.01
 P = np.random.randn(M1, M2) * 0.01
 V = np.random.randn(D, M1) * 0.01
 train_acc_ls = []
+valid_acc_ls = []
 test_acc_ls = []
 train_acc_ls3 = []
+valid_acc_ls3 = []
 test_acc_ls3 = []
 
 #%%
 
-#mlp_nn = mlp.mlp(W,V,train_acc_ls, test_acc_ls)
+#mlp_nn = mlp.mlp(W,V,train_acc_ls, valid_acc_ls, test_acc_ls)
 #
 ##mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'ReLu')
 ##mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'Leaky_ReLu')
@@ -111,7 +113,7 @@ test_acc_ls3 = []
 #
 #accuracy_ls = []
 for i in range(1):
-    mlp_nn3 = mlp_3.mlp_three(W,P,V, train_acc_ls3, test_acc_ls3)
+    mlp_nn3 = mlp_3.mlp_three(W,P,V, train_acc_ls3, valid_acc_ls3, test_acc_ls3)
     mlp_nn3.fit_three(X_train, Y_train, X_valid, Y_valid, X_test, Y_test, 
                       M1, M2, lr, max_iters, batch_size, 'ReLu')
     
@@ -120,6 +122,7 @@ for i in range(1):
 #    accuracy_ls.append(accuracy)
 
 train_epoch3 = mlp_nn3.train_epoch_acc
+valid_epoch3 = mlp_nn3.valid_epoch_acc
 test_epoch3 = mlp_nn3.test_epoch_acc
 
 
