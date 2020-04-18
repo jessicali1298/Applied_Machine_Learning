@@ -88,8 +88,8 @@ class mlp_three:
         # take care last mini_batch separately if batch_size not divisible
         if (all_data.shape[0] % batch_size != 0) :
             last_batch = all_data[num_batches*batch_size :, :]
-            last_X = last_batch[:, 0:(cols - 10)]
-            last_Y = last_batch[:, (cols - 10):-1]
+            last_X = last_batch[:, 0:(cols)]
+            last_Y = last_batch[:, cols:]
             batch_ls.append((last_X, last_Y))
             
         return batch_ls
@@ -155,8 +155,8 @@ class mlp_three:
 #            print('dW: ', dW.shape)
             
             # compute dP (1st hidden layer counting from output)
-            dZ1 = np.dot(dY, W.T)   #N x M2
-            hidden_grad1 = self.ReLuGrad(Z1)  #N x M2
+            dZ1 = np.dot(dY, W.T)               #N x M2
+            hidden_grad1 = self.ReLuGrad(Z1)    #N x M2
             dP = np.dot(Z2.T, dZ1 * hidden_grad1)/N  #(M1 x M2)
             
             # compute dV (2nd hidden layer counting from output)
