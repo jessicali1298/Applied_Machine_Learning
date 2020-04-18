@@ -22,6 +22,18 @@ class mlp:
         z[z>0] = 1
         return z
         
+    def LeakyRelu(self, z):
+        print (z)
+        u = np.ones(z.shape)
+        u[z<0] = np.double(0.01)
+        z = z*u.T
+        return z
+    
+    def LeakyReluGD(self, z):
+        u = np.ones(z.shape)
+        u[z<=0] = np.double(0.01)
+        return u
+    
     def logistic(self, z):
         # Z = N x M
         pos_num = np.where(z>=0)
@@ -123,6 +135,20 @@ class mlp:
             dZ = np.dot(dY, W.T)    #N x M     10000 x 10
             
             hidden_grad = self.ReLuGrad(Z)
+            
+        elif act_func == 'Leaky_ReLu':
+            Z = self.LeakyRelu(np.dot(X,V)) #N x M     10000 x 10, hidden layer
+            
+            N,D = X.shape
+            Yh = self.softmax(np.dot(Z,W)) #N x K     10000 x 10
+            
+            dY = Yh - Y     #N x K     10000 x 10
+            
+            dW = np.dot(Z.T, dY)/N  #M x K     10 x 10 
+            
+            dZ = np.dot(dY, W.T)    #N x M     10000 x 10
+            
+            hidden_grad = self.LeakyReluGD(Z)
            
         dV = np.dot(X.T, dZ * hidden_grad)/N
 
@@ -166,7 +192,8 @@ class mlp:
         if (act_func == 'ReLu'): 
             softmax_result = self.softmax(np.dot(self.ReLu(np.dot(X, self.V)), self.W))
             
-            
+        elif (act_func == 'Leaky_ReLu'):
+            softmax_result = self.softmax(np.dot(self.LeakyRelu(np.dot(X, self.V)), self.W))
         elif (act_func == 'Tanh'):
             # do something
             print('Using Tanh')

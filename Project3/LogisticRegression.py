@@ -4,14 +4,11 @@ class LogisticRegression:
     
     def __init__(self, weight):
         self.weight = weight
-
-
 #%%
 # Logistic Regression:
 # 1. Use gradient descent to find weights for log-odds ratio
 # 2. Compute predicted probability (sigmoid function)
 # 3 prob > 0.5, y = 1;   prob < 0.5, y = 0;   prob = 0.5, use random decider
-
     def logistic(self,input1, input2):
         z = np.dot(input1, input2)
         
@@ -105,6 +102,3 @@ class LogisticRegression:
         comparison = np.equal(y_truth, y_pred)
         accuracy = (np.where(comparison == True)[0].size)/comparison.size
         return accuracy
-       
-        
-        

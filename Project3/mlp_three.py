@@ -3,7 +3,6 @@
 #You are encouraged to change the activation function (e.g., use ReLU), 
 #and increase the number of layers, and play with the number of units per layer
 
-
 # VARIABLES: type of activation function; number of layers, number of units/layer
 
 import numpy as np
@@ -13,7 +12,7 @@ class mlp_three:
         self.W = W
         self.P = P
         self.V = V
-    
+        
     def ReLu(self, z):
         zeroes = np.zeros(z.shape)
         return np.maximum(z,zeroes)
@@ -23,6 +22,7 @@ class mlp_three:
         z[z>0] = 1
         return z
         
+    
     def logistic(self, z):
         # Z = N x M
         pos_num = np.where(z>=0)
@@ -31,7 +31,8 @@ class mlp_three:
         ans = np.empty(z.shape)
         
         ans[pos_num[0], pos_num[1]] = 1/(1+np.exp(-z[pos_num[0], pos_num[1]]))
-        ans[neg_num[0], neg_num[1]] = np.exp(z[neg_num[0], neg_num[1]])/(1+np.exp(z[neg_num[0], neg_num[1]]))
+        ans[neg_num[0], neg_num[1]] = np.exp(z[neg_num[0], neg_num[1]])/(1+
+           np.exp(z[neg_num[0], neg_num[1]]))
     
         return ans
     
@@ -218,4 +219,3 @@ class mlp_three:
         Y_decode = np.argmax(Y, axis=1) 
         accuracy = np.mean(result == Y_decode)
         return result, accuracy
-    
