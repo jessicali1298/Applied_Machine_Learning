@@ -49,12 +49,11 @@ for i in range(1,4):
 
 Y_train = one_hot(Y_train)
 
-M1 = 200          # number of hidden units
+M1 = 500          # number of hidden units
 M2 = 200
-lr = 0.1/6000  # learning rate
-eps = 1e-9
-max_iters = 50
-batch_size = 40
+lr = 0.1/800  # learning rate
+max_iters = 40 #40
+batch_size = 20 #40
 
 N,D = X_train.shape
 N,K = Y_train.shape
@@ -81,19 +80,31 @@ V = np.random.randn(D, M1) * 0.01
 
 #%%
 # test 3-layer MLP
-mlp_nn3 = mlp_3.mlp_three(W,P,V)
-mlp_nn3.fit_three(X_train, Y_train, M1, M2, lr, max_iters, batch_size, 'ReLu')
+M1_ls = [2000]
+M2_ls = [10,30,50,80,100,150,200,300,500,800,1000]
+lr_ls = [0.1/100, 0.1/300,0.1/500, 0.1/800, 0.1/1000, 0.1/3000, 0.1/7000, 0.1/10000]
+max_iters_ls = [3, 5, 10, 20, 30, 50, 80, 100]
+batch_size_ls = [20,40,80,100,200,400,800,1000,2000]
+
+accuracy_ls = []
+for i in range(1):
+    mlp_nn3 = mlp_3.mlp_three(W,P,V)
+    mlp_nn3.fit_three(X_train, Y_train, M1, M2, lr, max_iters, batch_size, 'ReLu')
+    
+    # test the model
+    predictions, accuracy = mlp_nn3.predict_three(X_test, Y_test, 'ReLu')
+    accuracy_ls.append(accuracy)
 
 
-Wh3 = mlp_nn3.W
-Ph3 = mlp_nn3.P
-Vh3 = mlp_nn3.V
 
-# test the model
-predictions, accuracy = mlp_nn3.predict_three(X_test, Y_test, 'ReLu')
+#%%
+M1_result = [0.3916, 0.4593, 0.4648, 0.4689, 0.4742, 0.4866, 0.4801, 0.4925, 0.4852, 0.4972, 0.4965, 0.5043]
+lr_result = [0.4975, 0.5075, 0.4936, 0.4755, 0.4655, 0.4268, 0.3907, 0.3758]
+max_iters_result = [0.384, 0.4016, 0.4391, 0.4587, 0.4809, 0.5, 0.4999, 0.5068]
+batch_size_result = [0.5233, 0.505, 0.5042, 0.4926, 0.4586, 0.4492, 0.4078, 0.412, 0.3739]
 
 
-
+#%%
 #temp1 = np.argmax(np.array([[0,0,0,1,0,0], [1,0,0,0,0,0], [0,1,0,0,0,0]]),axis=1)
 #temp2 = np.argmax(np.array([[0,0,0,1,0,0], [1,0,0,0,0,0], [1,0,0,0,0,0]]), axis=1)
 #temp3 = np.array([[0,0,0,1,0,0], [1,0,0,0,0,0], [0,1,0,0,0,0]])
