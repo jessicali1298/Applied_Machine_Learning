@@ -9,9 +9,11 @@
 import numpy as np
 
 class mlp:
-    def __init__(self, W, V):
+    def __init__(self, W, V, train_epoch_acc, test_epoch_acc):
         self.W = W
         self.V = V
+        self.train_epoch_cc = train_epoch_acc
+        self.test_epoch_cc = test_epoch_acc
     
     def ReLu(self, z):
         zeroes = np.zeros(z.shape)
@@ -156,16 +158,17 @@ class mlp:
     
     
     
-    def mini_GD(self, X, Y, M, lr, max_iters, batch_size, act_func):
+    def mini_GD(self, X, Y, X2, Y2, M, lr, max_iters, batch_size, act_func):
 
         N,D = X.shape
         N,K = Y.shape
         W = np.random.randn(M, K) * 0.01
         V = np.random.randn(D, M) * 0.01
-#        dW = np.inf * np.ones_like(W)    
-
+  
+        train_epoch_ls = []
+        test_epoch_ls = []
         for i in range(max_iters):
-#            print('iteration: ', i)
+            print('iteration: ', i)
             batches = self.create_mini_batch(X, Y, batch_size)
             t = 0
             for batch in batches:
@@ -174,16 +177,24 @@ class mlp:
                 mini_Y = batch[1]
                 
                 dW, dV = self.gradients(mini_X, mini_Y, W, V, act_func)
-#                print('dW: ', dW.shape)
-#                print('W: ', W.shape)
+
                 W = W - lr*dW
                 V = V - lr*dV
+                self.W = W
+                self.V = V
                 t = t + 1
+            predictions_train, train_epoch = self.predict_three(X, Y, act_func)
+            predictions_test, test_epoch = self.predict_three(X2, Y2, act_func)
+            train_epoch_ls.append(train_epoch)
+            test_epoch_ls.append(test_epoch)
+            
+        self.train_epoch_acc = train_epoch_ls
+        self.test_epoch_acc = test_epoch_ls
         return W, V
     
     
-    def fit(self, X, Y, M, lr, max_iters, batch_size, act_func):
-        W, V = self.mini_GD(X, Y, M, lr, max_iters, batch_size, act_func)
+    def fit(self, X, Y, X2, Y2, M, lr, max_iters, batch_size, act_func):
+        W, V = self.mini_GD(X, Y, X2, Y2, M, lr, max_iters, batch_size, act_func)
         self.W = W
         self.V = V
     

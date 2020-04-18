@@ -8,10 +8,12 @@
 import numpy as np
 
 class mlp_three:
-    def __init__(self, W, P, V):
+    def __init__(self, W, P, V, train_epoch_acc, test_epoch_acc):
         self.W = W
         self.P = P
         self.V = V
+        self.train_epoch_acc = train_epoch_acc
+        self.test_epoch_acc = test_epoch_acc
         
     def ReLu(self, z):
         zeroes = np.zeros(z.shape)
@@ -56,20 +58,7 @@ class mlp_three:
         u_exp = np.exp(u - np.max(u,1)[:, None])
         result = u_exp / np.sum(u_exp, axis=-1)[:, None]
         return result
-    
-    
-    def cost(self,
-             X, #N x D
-             Y, #N x K
-             W, #M x K
-             V  #D x M
-             ):
-        Q = np.dot(X,V)
-        Z = self.ReLu(Q)
-        U = np.dot(Z, W)
-    #    Yh = softmax(U)
-        nll = -np.mean(np.sum(U*Y, 1) - self.logsumexp(U))
-        return nll
+
     
     def create_mini_batch(self, X, Y, batch_size):
         all_data = np.hstack((X,Y))  # stack X and Y horizontally [[X1, Y1]...[Xn, Yn]]
@@ -94,38 +83,7 @@ class mlp_three:
             
         return batch_ls
         
-    # assume middle layer activation function is ReLu
-    def gradients(self,
-                  X, #N x D
-                  Y, #N x K
-                  W, #M x K 
-                  V,  #D x M
-                  act_func
-                  ):
-#        print('X: ', X.shape)
-#        print('Y: ', Y.shape)
-#        print('W: ', W.shape)
-#        print('V: ', V.shape)
-        
-        if act_func == 'ReLu':
-            Z = self.ReLu(np.dot(X,V)) #N x M     10000 x 10, hidden layer
-            
-            N,D = X.shape
-            Yh = self.softmax(np.dot(Z,W)) #N x K     10000 x 10
-            
-            dY = Yh - Y     #N x K     10000 x 10
-            
-            dW = np.dot(Z.T, dY)/N  #M x K     10 x 10 
-            
-            dZ = np.dot(dY, W.T)    #N x M     10000 x 10
-            
-            hidden_grad = self.ReLuGrad(Z)
-           
-        dV = np.dot(X.T, dZ * hidden_grad)/N
 
-        return dW, dV
-    
-        # assume middle layer activation function is ReLu
     def gradients_three(self,
                   X, #N x D
                   Y, #N x K
@@ -166,15 +124,16 @@ class mlp_three:
             
         return dW, dP, dV
     
-    def mini_GD_three(self, X, Y, M1, M2, lr, max_iters, batch_size, act_func):
+    def mini_GD_three(self, X, Y, X2, Y2, M1, M2, lr, max_iters, batch_size, act_func):
 
         N,D = X.shape
         N,K = Y.shape
         W = np.random.randn(M2, K) * 0.01
         P = np.random.randn(M1,M2) * 0.01
         V = np.random.randn(D, M1) * 0.01
-#        dW = np.inf * np.ones_like(W)    
-
+  
+        train_epoch_ls = []
+        test_epoch_ls = []
         for i in range(max_iters):
             print('iteration: ', i)
             batches = self.create_mini_batch(X, Y, batch_size)
@@ -190,12 +149,22 @@ class mlp_three:
                 W = W - lr*dW
                 P = P - lr*dP
                 V = V - lr*dV
+                self.W = W
+                self.P = P
+                self.V = V
                 t = t + 1
+            predictions_train, train_epoch = self.predict_three(X, Y, act_func)
+            predictions_test, test_epoch = self.predict_three(X2, Y2, act_func)
+            train_epoch_ls.append(train_epoch)
+            test_epoch_ls.append(test_epoch)
+            
+        self.train_epoch_acc = train_epoch_ls
+        self.test_epoch_acc = test_epoch_ls
         return W, P, V
     
     
-    def fit_three(self, X, Y, M1, M2, lr, max_iters, batch_size, act_func):
-        W, P, V = self.mini_GD_three(X, Y, M1, M2, lr, max_iters, batch_size, act_func)
+    def fit_three(self, X, Y, X2, Y2, M1, M2, lr, max_iters, batch_size, act_func):
+        W, P, V = self.mini_GD_three(X, Y, X2, Y2, M1, M2, lr, max_iters, batch_size, act_func)
         self.W = W
         self.P = P
         self.V = V
