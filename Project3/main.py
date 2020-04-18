@@ -19,12 +19,12 @@ def one_hot(Y):
 
 root_path_Jessica = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
 root_path_Claire = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
-data_dir = sorted(os.listdir(root_path_Jessica))  # <-------
+data_dir = sorted(os.listdir(root_path_Claire))  # <-------
 dict_ls = []
 
 # All train and test data are loaded as a list of dict
 for i in range(len(data_dir)):
-    final_path = os.path.join(root_path_Jessica, data_dir[i]) # <---------
+    final_path = os.path.join(root_path_Claire, data_dir[i]) # <---------
     dict_ls.append(unpickle(final_path))
 
 
@@ -63,16 +63,16 @@ P = np.random.randn(M1, M2) * 0.01
 V = np.random.randn(D, M1) * 0.01
 
 #%%
-#mlp_nn = mlp.mlp(W,V)
-#
-#mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'ReLu')
-#
-#
-#Wh = mlp_nn.W
-#Vh = mlp_nn.V
-#
-## test the model
-#predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
+mlp_nn = mlp.mlp(W,V)
+
+mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'Leaky_ReLu')
+
+
+Wh = mlp_nn.W
+Vh = mlp_nn.V
+
+# test the model
+predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'Leaky_ReLu')
 
 #%%
 # 5-fold cross validation
@@ -141,4 +141,3 @@ predictions, accuracy = mlp_nn3.predict_three(X_test, Y_test, 'ReLu')
 #print(idx1)
 #print(temp1[idx1[0], idx1[1]])
 #print(np.max(temp1, axis=-1)[:,None])
-
