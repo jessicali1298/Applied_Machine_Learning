@@ -124,7 +124,7 @@ class mlp_three:
             
         return dW, dP, dV
     
-    def mini_GD_three(self, X, Y, X2, Y2, M1, M2, lr, max_iters, batch_size, act_func):
+    def mini_GD_three(self, X, Y, X2, Y2, X3, Y3, M1, M2, lr, max_iters, batch_size, act_func):
 
         N,D = X.shape
         N,K = Y.shape
@@ -153,8 +153,8 @@ class mlp_three:
                 self.P = P
                 self.V = V
                 t = t + 1
-            predictions_train, train_epoch = self.predict_three(X, Y, act_func)
-            predictions_test, test_epoch = self.predict_three(X2, Y2, act_func)
+            predictions_train, train_epoch = self.predict_three(X2, Y2, act_func)
+            predictions_test, test_epoch = self.predict_three(X3, Y3, act_func)
             train_epoch_ls.append(train_epoch)
             test_epoch_ls.append(test_epoch)
             
@@ -163,8 +163,8 @@ class mlp_three:
         return W, P, V
     
     
-    def fit_three(self, X, Y, X2, Y2, M1, M2, lr, max_iters, batch_size, act_func):
-        W, P, V = self.mini_GD_three(X, Y, X2, Y2, M1, M2, lr, max_iters, batch_size, act_func)
+    def fit_three(self, X, Y, X2, Y2, X3, Y3, M1, M2, lr, max_iters, batch_size, act_func):
+        W, P, V = self.mini_GD_three(X, Y, X2, Y2, X3, Y3, M1, M2, lr, max_iters, batch_size, act_func)
         self.W = W
         self.P = P
         self.V = V

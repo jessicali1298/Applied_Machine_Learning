@@ -179,7 +179,7 @@ class mlp:
     
     
     
-    def mini_GD(self, X, Y, X2, Y2, M, lr, max_iters, batch_size, act_func):
+    def mini_GD(self, X, Y, X2, Y2, X3, Y3, M, lr, max_iters, batch_size, act_func):
 
         N,D = X.shape
         N,K = Y.shape
@@ -204,8 +204,8 @@ class mlp:
                 self.W = W
                 self.V = V
                 t = t + 1
-            predictions_train, train_epoch = self.predict_three(X, Y, act_func)
-            predictions_test, test_epoch = self.predict_three(X2, Y2, act_func)
+            predictions_train, train_epoch = self.predict(X2, Y2, act_func)
+            predictions_test, test_epoch = self.predict(X3, Y3, act_func)
             train_epoch_ls.append(train_epoch)
             test_epoch_ls.append(test_epoch)
             
@@ -214,8 +214,8 @@ class mlp:
         return W, V
     
     
-    def fit(self, X, Y, X2, Y2, M, lr, max_iters, batch_size, act_func):
-        W, V = self.mini_GD(X, Y, X2, Y2, M, lr, max_iters, batch_size, act_func)
+    def fit(self, X, Y, X2, Y2, X3, Y3, M, lr, max_iters, batch_size, act_func):
+        W, V = self.mini_GD(X, Y, X2, Y2, X3, Y3, M, lr, max_iters, batch_size, act_func)
         self.W = W
         self.V = V
     
