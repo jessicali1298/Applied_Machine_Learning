@@ -19,12 +19,12 @@ def one_hot(Y):
 
 root_path_Jessica = '/Users/j.li/School/U4_WINTER/COMP 551/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
 root_path_Claire = '/Users/liuxijun/Downloads/Applied_Machine_Learning/Project3/cifar-10-batches-py/data_batch/'
-data_dir = sorted(os.listdir(root_path_Jessica))  # <-------
+data_dir = sorted(os.listdir(root_path_Claire))  # <-------
 dict_ls = []
 
 # All train and test data are loaded as a list of dict
 for i in range(len(data_dir)):
-    final_path = os.path.join(root_path_Jessica, data_dir[i]) # <---------
+    final_path = os.path.join(root_path_Claire, data_dir[i]) # <---------
     dict_ls.append(unpickle(final_path))
 
 
@@ -51,7 +51,7 @@ for i in range(1,4):
 
 Y_train = one_hot(Y_train)
 
-M1 = 1024          # number of hidden units
+M1 = 1000         # number of hidden units
 M2 = 256
 
 # lr = 0.1/6000  # learning rate
@@ -59,9 +59,9 @@ M2 = 256
 # max_iters = 2
 # batch_size = 40
 
-lr = 0.1/800  # learning rate
-max_iters = 10 #40
-batch_size = 1250 #40
+lr = 0.1/10000  # learning rate
+max_iters = 40 #40
+batch_size = 40 #40
 
 
 N,D = X_train.shape
@@ -78,25 +78,25 @@ test_acc_ls3 = []
 
 #%%
 
-#mlp_nn = mlp.mlp(W,V,train_acc_ls, valid_acc_ls, test_acc_ls)
-#
-##mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'ReLu')
-##mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'Leaky_ReLu')
-#mlp_nn.fit(X_train, Y_train, X_valid, Y_valid, X_test, Y_test, 
-#           M1, lr, max_iters, batch_size, 'Soft_Plus')
-#Wh = mlp_nn.W
-#Vh = mlp_nn.V
-#
-## test the model
-##predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
-##predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'Leaky_ReLu')
-##predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'Soft_Plus')
-#
-#
-## can check train/test accuracy at each Epoch
-#train_epoch = mlp_nn.train_epoch_acc
-#test_epoch = mlp_nn.test_epoch_acc
+mlp_nn = mlp.mlp(W,V,train_acc_ls, valid_acc_ls, test_acc_ls)
 
+#mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'ReLu')
+#mlp_nn.fit(X_train, Y_train, M1, lr, max_iters, batch_size, 'Leaky_ReLu')
+mlp_nn.fit(X_train, Y_train, X_valid, Y_valid, X_test, Y_test, 
+           M1, lr, 40 ,40, 'Leaky_ReLu')
+Wh = mlp_nn.W
+Vh = mlp_nn.V
+
+# test the model
+#predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'ReLu')
+#predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'Leaky_ReLu')
+#predictions, accuracy = mlp_nn.predict(X_test, Y_test, 'Soft_Plus')
+
+
+# can check train/test accuracy at each Epoch
+train_epoch = mlp_nn.train_epoch_acc
+test_epoch = mlp_nn.test_epoch_acc
+valid_epoch = mlp_nn.valid_epoch_acc
 
 #%%
 # 5-fold cross validation
@@ -110,22 +110,49 @@ test_acc_ls3 = []
 #lr_ls = [0.1/100, 0.1/300,0.1/500, 0.1/800, 0.1/1000, 0.1/3000, 0.1/7000, 0.1/10000]
 #max_iters_ls = [3, 5, 10, 20, 30, 50, 80, 100]
 #batch_size_ls = [20,40,80,100,200,400,800,1000,2000]
-#
+
 #accuracy_ls = []
+#for i in range(1):
+#    mlp_nn3 = mlp_3.mlp_three(W,P,V, train_acc_ls3, valid_acc_ls3, test_acc_ls3)
+#    mlp_nn3.fit_three(X_train, Y_train, X_valid, Y_valid, X_test, Y_test, 
+#                      1024, 128, 0.1/650, max_iters, batch_size, 'ReLu')
+#    
+#    # test the model
+##    predictions, accuracy = mlp_nn3.predict_three(X_valid, Y_valid, 'ReLu')
+##    accuracy_ls.append(accuracy)
+#
+#train_epoch3_relu = mlp_nn3.train_epoch_acc
+#valid_epoch3_relu = mlp_nn3.valid_epoch_acc
+#test_epoch3_relu = mlp_nn3.test_epoch_acc
+#
+##%%
+#accuracy_ls = []
+#for i in range(1):
+#    mlp_nn3 = mlp_3.mlp_three(W,P,V, train_acc_ls3, valid_acc_ls3, test_acc_ls3)
+#    mlp_nn3.fit_three(X_train, Y_train, X_valid, Y_valid, X_test, Y_test, 
+#                      1024, 128, 0.1/650, max_iters, batch_size, 'Leaky_ReLu')
+#    
+#    # test the model
+##    predictions, accuracy = mlp_nn3.predict_three(X_valid, Y_valid, 'ReLu')
+##    accuracy_ls.append(accuracy)
+#
+#train_epoch3_lrelu = mlp_nn3.train_epoch_acc
+#valid_epoch3_lrelu = mlp_nn3.valid_epoch_acc
+#test_epoch3_lrelu = mlp_nn3.test_epoch_acc
+#%%
+accuracy_ls = []
 for i in range(1):
     mlp_nn3 = mlp_3.mlp_three(W,P,V, train_acc_ls3, valid_acc_ls3, test_acc_ls3)
     mlp_nn3.fit_three(X_train, Y_train, X_valid, Y_valid, X_test, Y_test, 
-                      M1, M2, lr, max_iters, batch_size, 'ReLu')
+                      1024, 128, 0.1/650, max_iters, batch_size, 'Soft_Plus')
     
     # test the model
 #    predictions, accuracy = mlp_nn3.predict_three(X_valid, Y_valid, 'ReLu')
 #    accuracy_ls.append(accuracy)
 
-train_epoch3 = mlp_nn3.train_epoch_acc
-valid_epoch3 = mlp_nn3.valid_epoch_acc
-test_epoch3 = mlp_nn3.test_epoch_acc
-
-
+train_epoch3_soft = mlp_nn3.train_epoch_acc
+valid_epoch3_soft = mlp_nn3.valid_epoch_acc
+test_epoch3_soft = mlp_nn3.test_epoch_acc
 #%%
 #M1_result = [0.3916, 0.4593, 0.4648, 0.4689, 0.4742, 0.4866, 0.4801, 0.4925, 0.4852, 0.4972, 0.4965, 0.5043]
 #lr_result = [0.4975, 0.5075, 0.4936, 0.4755, 0.4655, 0.4268, 0.3907, 0.3758]
@@ -186,3 +213,66 @@ test_epoch3 = mlp_nn3.test_epoch_acc
 #print(idx1)
 #print(temp1[idx1[0], idx1[1]])
 #print(np.max(temp1, axis=-1)[:,None])
+#%%
+#import matplotlib.pyplot as plt 
+#
+#plt.plot(train_epoch, label = "train epoch") 
+#  
+#plt.plot(test_epoch, label = "test epoch") 
+#plt.plot(valid_epoch, label = 'validation epoch')
+## naming the x axis 
+#plt.xlabel('Training Epoch') 
+## naming the y axis 
+#plt.ylabel('Accuracy') 
+## giving a title to my graph 
+#plt.title("Training Epoch v.s. Train/Test/Validation Accuracy (2 Layer MLP, Leaky ReLu)") 
+#  
+## show a legend on the plot 
+#plt.legend() 
+#  
+## function to show the plot 
+#plt.show() 
+#%%
+#import matplotlib.pyplot as plt 
+#
+#plt.plot(test_epoch_soft, label = "Soft Plus") 
+#  
+#plt.plot(test_epoch_ReLu, label = "ReLu") 
+#plt.plot(test_epoch, label = 'Leaky ReLu')
+## naming the x axis 
+#plt.xlabel('Training Epoch') 
+## naming the y axis 
+#plt.ylabel('Test Accuracy') 
+## giving a title to my graph 
+#plt.title("Training Epoch v.s. Test Accuracy of ReLu/Leaky ReLu/Soft Plus (2 Layer MLP)") 
+#  
+## show a legend on the plot 
+#plt.legend() 
+#  
+## function to show the plot 
+#plt.show() 
+
+#print('2-Layer ReLu train accuracy:', max(train_epoch_ReLu))
+#print('2-Layer ReLu test accuracy:', max(test_epoch_ReLu))
+#print('2-Layer ReLu validation accuracy:', max(valid_epoch_ReLu))
+#
+#print('2-Layer Leaky ReLu train accuracy:', max(train_epoch))
+#print('2-Layer Leaky ReLu test accuracy:', max(test_epoch))
+#print('2-Layer Leaky ReLu validation accuracy:', max(valid_epoch))
+#
+#print('2-Layer SoftPlus train accuracy:', max(train_epoch_soft))
+#print('2-Layer SoftPlus test accuracy:', max(test_epoch_soft))
+#print('2-Layer SoftPlus validation accuracy:', max(valid_epoch_soft))
+#
+#print('3-Layer ReLu train accuracy:', max(train_epoch3_relu))
+#print('3-Layer ReLu test accuracy:', max(test_epoch3_relu))
+#print('3-Layer ReLu validation accuracy:', max(valid_epoch3_relu))
+#
+#print('3-Layer Leaky ReLu train accuracy:', max(train_epoch3_lrelu))
+#print('3-Layer Leaky ReLu test accuracy:', max(test_epoch3_lrelu))
+#print('3-Layer Leaky ReLu validation accuracy:', max(valid_epoch3_lrelu))
+#
+#print('3-Layer SoftPlus train accuracy:', max(train_epoch3_soft))
+#print('3-Layer SoftPlus test accuracy:', max(test_epoch3_soft))
+#print('3-Layer SoftPlus validation accuracy:', max(valid_epoch3_soft))
+

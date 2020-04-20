@@ -24,8 +24,26 @@ class mlp_three:
         z[z<=0] = 0
         z[z>0] = 1
         return z
-        
+    def LeakyRelu(self, z):
+        u = np.ones(z.shape)
+        u[z<0] = np.double(0.01)
+        z = z*u
+        return z
     
+    def LeakyReluGD(self, z):
+        u = np.ones(z.shape)
+        u[z<=0] = np.double(0.01)
+        return u
+    
+    def SoftPlus (self, z):
+        z = np.log(1+np.exp(z))
+        return z
+    
+    def SoftPlusGD(self, z):
+        exp_z = np.exp(z)
+        u = exp_z /(1+exp_z)
+        return u 
+        
     def logistic(self, z):
         # Z = N x M
         pos_num = np.where(z>=0)
@@ -122,7 +140,54 @@ class mlp_three:
             dZ2 = np.dot(dZ1 * hidden_grad1, P.T)  #(N x M2)(M2 x M1) = N x M1
             hidden_grad2 = self.ReLuGrad(Z2)       # (N x M1)
             dV = np.dot(X.T, dZ2 * hidden_grad2)/N # (D x N)(N x M1) = D x M1
+        elif act_func == 'Leaky_ReLu':
+            Z2 = self.LeakyRelu(np.dot(X,V))   #N x M1     10000 x 10, hidden layer
+            Z1 = self.LeakyRelu(np.dot(Z2,P))  #N x M2
+    #        print('input of ReLu: Z', Z.shape)
             
+            N,D = X.shape
+            Yh = self.softmax(np.dot(Z1,W)) #N x K     10000 x 10
+    #        print('Yh: ', Yh.shape)
+            
+            dY = Yh - Y     #N x K     10000 x 10
+    #        print('dY: ', dY.shape)
+            
+            dW = np.dot(Z1.T, dY)/N  #M2 x K     
+#            print('dW: ', dW.shape)
+            
+            # compute dP (1st hidden layer counting from output)
+            dZ1 = np.dot(dY, W.T)               #N x M2
+            hidden_grad1 = self.LeakyReluGD(Z1)    #N x M2
+            dP = np.dot(Z2.T, dZ1 * hidden_grad1)/N  #(M1 x M2)
+            
+            # compute dV (2nd hidden layer counting from output)
+            dZ2 = np.dot(dZ1 * hidden_grad1, P.T)  #(N x M2)(M2 x M1) = N x M1
+            hidden_grad2 = self.LeakyReluGD(Z2)       # (N x M1)
+            dV = np.dot(X.T, dZ2 * hidden_grad2)/N # (D x N)(N x M1) = D x M1
+        elif act_func == 'Soft_Plus':
+            Z2 = self.SoftPlus(np.dot(X,V))   #N x M1     10000 x 10, hidden layer
+            Z1 = self.SoftPlus(np.dot(Z2,P))  #N x M2
+    #        print('input of ReLu: Z', Z.shape)
+            
+            N,D = X.shape
+            Yh = self.softmax(np.dot(Z1,W)) #N x K     10000 x 10
+    #        print('Yh: ', Yh.shape)
+            
+            dY = Yh - Y     #N x K     10000 x 10
+    #        print('dY: ', dY.shape)
+            
+            dW = np.dot(Z1.T, dY)/N  #M2 x K     
+#            print('dW: ', dW.shape)
+            
+            # compute dP (1st hidden layer counting from output)
+            dZ1 = np.dot(dY, W.T)               #N x M2
+            hidden_grad1 = self.SoftPlusGD(Z1)    #N x M2
+            dP = np.dot(Z2.T, dZ1 * hidden_grad1)/N  #(M1 x M2)
+            
+            # compute dV (2nd hidden layer counting from output)
+            dZ2 = np.dot(dZ1 * hidden_grad1, P.T)  #(N x M2)(M2 x M1) = N x M1
+            hidden_grad2 = self.SoftPlusGD(Z2)       # (N x M1)
+            dV = np.dot(X.T, dZ2 * hidden_grad2)/N # (D x N)(N x M1) = D x M1
         return dW, dP, dV
     
     def mini_GD_three(self, X, Y, X2, Y2, X3, Y3, M1, M2, lr, max_iters, batch_size, act_func):
@@ -136,6 +201,7 @@ class mlp_three:
         train_epoch_ls = []
         valid_epoch_ls = []
         test_epoch_ls = []
+        
         for i in range(max_iters):
             print('iteration: ', i)
             batches = self.create_mini_batch(X, Y, batch_size)
@@ -174,12 +240,16 @@ class mlp_three:
         self.P = P
         self.V = V
     
-    
     def predict_three(self, X, Y, act_func):
         if (act_func == 'ReLu'): 
             temp = self.ReLu(np.dot(self.ReLu(np.dot(X, self.V)), self.P))
             softmax_result = self.softmax(np.dot(temp, self.W))
-            
+        elif (act_func == 'Leaky_ReLu'):
+            temp = self.LeakyRelu(np.dot(self.LeakyRelu(np.dot(X, self.V)), self.P))
+            softmax_result = self.softmax(np.dot(temp, self.W))
+        elif (act_func == 'Soft_Plus'):
+            temp = self.SoftPlus(np.dot(self.SoftPlus(np.dot(X, self.V)), self.P))
+            softmax_result = self.softmax(np.dot(temp, self.W))
             
         elif (act_func == 'Tanh'):
             # do something
@@ -193,3 +263,68 @@ class mlp_three:
         Y_decode = np.argmax(Y, axis=1) 
         accuracy = np.mean(result == Y_decode)
         return result, accuracy
+    
+    def mini_GD_three_earlyStopping(self, X, Y, X2, Y2, X3, Y3, M1, M2, lr, max_iters, batch_size, act_func):
+
+        N,D = X.shape
+        N,K = Y.shape
+        W = np.random.randn(M2, K) * 0.01
+        P = np.random.randn(M1,M2) * 0.01
+        V = np.random.randn(D, M1) * 0.01
+        
+    
+        train_epoch_ls = []
+        valid_epoch_ls = []
+        test_epoch_ls = []
+        max_test_ls = []
+        max_test_epoch = 0
+        itera = 0
+        W_ls = []
+        P_ls = []
+        V_ls = []
+        
+        for i in range(max_iters):
+            print('iteration: ', i)
+            batches = self.create_mini_batch(X, Y, batch_size)
+            t = 0
+            for batch in batches:
+#                print('batch number: ', t)
+                mini_X = batch[0]
+                mini_Y = batch[1]
+                
+                dW, dP, dV = self.gradients_three(mini_X, mini_Y, W, P, V, act_func)
+#                print('dW: ', dW.shape)
+#                print('W: ', W.shape)
+                W = W - lr*dW
+                P = P - lr*dP
+                V = V - lr*dV
+                self.W = W
+                self.P = P
+                self.V = V
+                t = t + 1
+            predictions_train, train_epoch = self.predict_three(X, Y, act_func)
+            predictions_valid, valid_epoch = self.predict_three(X2, Y2, act_func)
+            predictions_test, test_epoch = self.predict_three(X3, Y3, act_func)
+                
+            train_epoch_ls.append(train_epoch)
+            valid_epoch_ls.append(valid_epoch)
+            test_epoch_ls.append(test_epoch)
+            if test_epoch > max_test_epoch+0.005:
+                max_test_epoch = test_epoch
+                itera = i
+            max_test_ls.append(max_test_epoch)
+            W_ls.append(W)
+            P_ls.append(P)
+            V_ls.append(V)
+            if i - itera >= 4:
+                return W_ls[itera], P_ls[itera], V_ls[itera]
+                
+        self.train_epoch_acc = train_epoch_ls
+        self.valid_epoch_acc = valid_epoch_ls
+        self.test_epoch_acc = test_epoch_ls
+        return W, P, V 
+    
+    def fit_earlyStoppingdef(self, X, Y, X2, Y2, X3, Y3, M1, M2, lr, max_iters, batch_size, act_func):
+        W, V = self.mini_GD_earlyStopping(self, X, Y, X2, Y2, X3, Y3, M1, M2, lr, max_iters, batch_size, act_func)
+        self.W = W
+        self.V = V

@@ -244,3 +244,60 @@ class mlp:
         accuracy = np.mean(result == Y_decode)
         return result, accuracy
     
+    def fit_earlyStopping(self, X, Y, X2, Y2, X3, Y3, M, lr, max_iters, batch_size, act_func):
+        W, V = self.mini_GD_earlyStopping(self, X, Y, X2, Y2, X3, Y3, M, lr, max_iters, batch_size, act_func)
+        self.W = W
+        self.V = V
+        
+    def mini_GD_earlyStopping(self, X, Y, X2, Y2, X3, Y3, M, lr, max_iters, batch_size, act_func):
+
+        N,D = X.shape
+        N,K = Y.shape
+        W = np.random.randn(M, K) * 0.01
+        V = np.random.randn(D, M) * 0.01
+  
+        train_epoch_ls = []
+        valid_epoch_ls = []
+        test_epoch_ls = []
+        max_test_ls = []
+        max_test_epoch = 0
+        itera = 0
+        W_ls = []
+        V_ls = []
+        
+        for i in range(max_iters):
+            print('iteration: ', i)
+            batches = self.create_mini_batch(X, Y, batch_size)
+            t = 0
+            for batch in batches:
+#                print('batch number: ', t)
+                mini_X = batch[0]
+                mini_Y = batch[1]
+                
+                dW, dV = self.gradients(mini_X, mini_Y, W, V, act_func)
+
+                W = W - lr*dW
+                V = V - lr*dV
+                self.W = W
+                self.V = V
+                t = t + 1
+            predictions_train, train_epoch = self.predict(X, Y, act_func)
+            predictions_valid, valid_epoch = self.predict(X2, Y2, act_func)
+            predictions_test, test_epoch = self.predict(X3, Y3, act_func)
+            train_epoch_ls.append(train_epoch)
+            valid_epoch_ls.append(valid_epoch)
+            test_epoch_ls.append(test_epoch)
+            
+            if test_epoch > max_test_epoch+0.005:
+                max_test_epoch = test_epoch
+                itera = i
+            max_test_ls.append(max_test_epoch)
+            W_ls.append(W)
+            V_ls.append(V)
+            if i - itera >= 4:
+                return W_ls[itera], V_ls[itera]
+            
+        self.train_epoch_acc = train_epoch_ls
+        self.valid_epoch_acc = valid_epoch_ls
+        self.test_epoch_acc = test_epoch_ls
+        return W, V
